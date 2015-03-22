@@ -1,8 +1,10 @@
-var isNullOrUndefined = require("is_null_or_undefined"),
+var getViewKey = require("./utils/get_view_key"),
+    isNullOrUndefined = require("is_null_or_undefined"),
     getPrototypeOf = require("get_prototype_of"),
     isObject = require("is_object"),
     diffProps = require("./utils/diff_props"),
-    View = require("./view");
+    View = require("./view"),
+    Node;
 
 
 var isView = View.isView,
@@ -12,24 +14,24 @@ var isView = View.isView,
 module.exports = diff;
 
 
-function diff(previous, next, patches, id) {
+function diff(root, node, previous, next, patches, id) {
     var propsDiff = diffProps(previous.props, next.props);
 
     if (propsDiff !== null) {
         patches.props(id, previous.props, propsDiff);
     }
 
-    return diffChildren(previous, next, patches, id);
+    return diffChildren(root, node, previous, next, patches, id);
 }
 
-function diffChildren(previous, next, patches, parentId) {
+function diffChildren(root, node, previous, next, patches, parentId) {
     var previousChildren = previous.children,
         nextChildren = reorder(previousChildren, next.children),
         previousLength = previousChildren.length,
         nextLength = nextChildren.length,
         i = -1,
         il = (previousLength > nextLength ? previousLength : nextLength) - 1,
-        previousChild, nextChild;
+        previousChild, nextChild, childNode, id;
 
     while (i++ < il) {
         previousChild = previousChildren[i];
@@ -37,26 +39,58 @@ function diffChildren(previous, next, patches, parentId) {
 
         if (isNullOrUndefined(previousChild)) {
             if (!isNullOrUndefined(nextChild)) {
-                console.log("insert", nextChild);
+                insert(node, nextChild, parentId, i);
             }
-        } else {
-            if (isPrimativeView(previousChild)) {
-                if (isPrimativeView(nextChild)) {
-                    if (previousChild !== nextChild) {
-                        console.log("replace", previousChild, nextChild);
-                    }
-                } else {
-                    console.log("replace with View");
+        } else if (isPrimativeView(previousChild)) {
+            if (isPrimativeView(nextChild)) {
+                if (previousChild !== nextChild) {
+                    patches.text(parentId, i, nextChild);
                 }
             } else {
-                previousChild.__node.update(nextChild, patches);
+                replace(node, nextChild, parentId, i);
+            }
+        } else {
+            if (isNullOrUndefined(nextChild)) {
+                id = parentId + "." + getViewKey(previousChild, i);
+                childNode = root.childHash[id];
+                childNode.unmount(i);
+            } else if (isPrimativeView(nextChild)) {
+                if (isPrimativeView(nextChild)) {
+                    if (previousChild !== nextChild) {
+                        patches.text(parentId, i, nextChild);
+                    }
+                } else {
+                    replace(node, nextChild, parentId, i);
+                }
+            } else {
+                id = parentId + "." + getViewKey(previousChild, i);
+                childNode = root.childHash[id];
+                childNode.__update(nextChild, patches);
             }
         }
     }
 
     if (nextChildren.moves) {
-        console.log("order");
+        patches.order(parentId, nextChildren.moves);
     }
+}
+
+Node = require("./node");
+
+function insert(parentNode, nextChild, parentId, index) {
+    var node = Node.create(nextChild);
+
+    node.id = parentId + "." + getViewKey(nextChild, index);
+    parentNode.appendNode(node);
+    node.mount(index);
+}
+
+function replace(parentNode, nextChild, parentId, index) {
+    var node = Node.create(nextChild);
+
+    node.id = parentId + "." + getViewKey(nextChild, index);
+    parentNode.appendNode(node);
+    node.mount(index);
 }
 
 function reorder(previousChildren, nextChildren) {

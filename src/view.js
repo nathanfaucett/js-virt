@@ -6,7 +6,8 @@ var isPrimitive = require("is_primitive"),
     isNumber = require("is_number"),
     fastSlice = require("fast_slice"),
     has = require("has"),
-    map = require("map");
+    map = require("map"),
+    events = require("./events");
 
 
 var ViewPrototype;
@@ -100,6 +101,23 @@ function construct(type, config, children) {
     return new View(type, key, ref, props, insureValidChildren(children));
 }
 
+function propsToJSON(props) {
+    var localHas = has,
+        localEvents = events,
+        out = {},
+        key;
+
+    for (key in props) {
+        if (localHas(localEvents, key)) {
+            out[key] = true;
+        } else {
+            out[key] = props[key];
+        }
+    }
+
+    return out;
+}
+
 function toJSON(view) {
     if (isPrimitive(view)) {
         return view;
@@ -108,7 +126,7 @@ function toJSON(view) {
             type: view.type,
             key: view.key,
             ref: view.ref,
-            props: view.props,
+            props: propsToJSON(view.props),
             children: map(view.children, toJSON)
         };
     }

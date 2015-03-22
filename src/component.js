@@ -10,6 +10,7 @@ module.exports = Component;
 
 function Component(props, children) {
     this.__node = null;
+    this.__previousState = null;
     this.props = props;
     this.children = children;
     this.state = null;
@@ -34,13 +35,20 @@ ComponentPrototype.render = function() {
 ComponentPrototype.setState = function(state) {
     var node = this.__node;
 
-    this._previousState = this.state;
+    this.__previousState = this.state;
     this.state = extend({}, this.state, state);
 
     node.update(node.renderedView);
 };
 
+ComponentPrototype.forceUpdate = function() {
+    var node = this.__node;
+    node.update(node.renderedView);
+};
+
 ComponentPrototype.componentDidMount = function() {};
+
+ComponentPrototype.componentDidUnmount = function() {};
 
 ComponentPrototype.componentDidUpdate = function( /* previousProps, previousState */ ) {};
 

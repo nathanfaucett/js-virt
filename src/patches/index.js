@@ -81,8 +81,8 @@ Patches.prototype.replace = function(id, index, previous, next) {
     return this.append(ReplacePatch.create(id, index, previous, next));
 };
 
-Patches.prototype.text = function(id, index, next) {
-    return this.append(TextPatch.create(id, index, next));
+Patches.prototype.text = function(id, index, text) {
+    return this.append(TextPatch.create(id, index, text));
 };
 
 Patches.prototype.append = function(value) {

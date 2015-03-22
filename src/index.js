@@ -4,8 +4,7 @@ var View = require("./view");
 var virt = exports;
 
 
-virt.Root = require("./tree/root");
-virt.render = require("./render");
+virt.Root = require("./root");
 
 virt.Component = require("./component");
 

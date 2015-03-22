@@ -11,14 +11,16 @@
     "virt",
     "virt.js"
   ],
+  "scripts": {
+    "example": "comn -f example/index.js -o example/index.min.js"
+  },
   "author": "Nathan Faucett",
   "license": "BSD-2-Clause",
   "readmeFilename": "README.md",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
-    "grunt-jsbeautifier": "^0.2.7",
-    "mocha": "^2.1.0"
+    "grunt-jsbeautifier": "^0.2.7"
   },
   "dependencies": {
     "create_pool": "git://github.com/nathanfaucett/create_pool",
@@ -27,6 +29,7 @@
     "for_each": "git://github.com/nathanfaucett/for_each",
     "get_prototype_of": "git://github.com/nathanfaucett/get_prototype_of",
     "has": "git://github.com/nathanfaucett/has",
+    "index_of": "git://github.com/nathanfaucett/index_of",
     "inherits": "git://github.com/nathanfaucett/inherits",
     "is_array": "git://github.com/nathanfaucett/is_array",
     "is_function": "git://github.com/nathanfaucett/is_function",
