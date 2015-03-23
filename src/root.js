@@ -1,4 +1,4 @@
-var indexOf = require("index_of"),
+var Patches = require("./patches"),
     shouldUpdate = require("./utils/should_update"),
     Node = require("./node");
 
@@ -14,12 +14,10 @@ function Root() {
 
     this.id = "." + (ROOT_ID++).toString(36);
     this.childHash = {};
-
     this.adaptor = null;
 
-    this.__mountQueue = [];
-    this.__unmountQueue = [];
-    this.__updateQueue = [];
+    this.__transactions = [];
+    this.__currentTransaction = null;
 }
 
 RootPrototype = Root.prototype;
@@ -32,7 +30,7 @@ RootPrototype.appendNode = function(node) {
         node.root = this;
         childHash[id] = node;
     } else {
-        throw new Error("Root add(node) trying to override node at " + id);
+        throw new Error("Root appendNode(node) trying to override node at " + id);
     }
 };
 
@@ -44,99 +42,56 @@ RootPrototype.removeNode = function(node) {
         node.parent = null;
         delete childHash[id];
     } else {
-        throw new Error("Root remove(node) trying to remove node that does not exists with id " + id);
+        throw new Error("Root removeNode(node) trying to remove node that does not exists with id " + id);
     }
 };
 
-RootPrototype.onMount = function(callback) {
-    var queue = this.__mountQueue;
-    queue[queue.length] = callback;
-};
+RootPrototype.__handle = function() {
+    var _this = this,
+        transactions = this.__transactions,
+        patches;
 
-RootPrototype.onUnmount = function(callback) {
-    var queue = this.__unmountQueue;
-    queue[queue.length] = callback;
-};
+    if (transactions.length !== 0 && this.__currentTransaction === null) {
+        this.__currentTransaction = patches = transactions.shift();
 
-RootPrototype.onUpdate = function(callback) {
-    var queue = this.__updateQueue;
-    queue[queue.length] = callback;
-};
+        this.adaptor.handle(patches, function() {
 
-RootPrototype.notifyMount = function() {
-    var queue = this.__mountQueue,
-        i = -1,
-        il = queue.length - 1;
+            patches.queue.notifyAll();
+            patches.destroy();
 
-    while (i++ < il) {
-        queue[i]();
+            _this.__currentTransaction = null;
+            _this.__handle();
+        });
     }
-    queue.length = 0;
-};
-
-RootPrototype.notifyUnmount = function() {
-    var queue = this.__unmountQueue,
-        i = -1,
-        il = queue.length - 1;
-
-    while (i++ < il) {
-        queue[i]();
-    }
-    queue.length = 0;
-};
-
-RootPrototype.notifyUpdate = function() {
-    var queue = this.__updateQueue,
-        i = -1,
-        il = queue.length - 1;
-
-    while (i++ < il) {
-        queue[i]();
-    }
-    queue.length = 0;
-};
-
-RootPrototype.mount = function(parentId, id, index, view) {
-    var _this = this;
-
-    this.adaptor.mount(parentId, id, index, view, function() {
-        _this.notifyMount();
-    });
-};
-
-RootPrototype.unmount = function(parentId, id) {
-    var _this = this;
-
-    this.adaptor.unmount(parentId, id, function() {
-        _this.notifyUnmount();
-    });
-};
-
-RootPrototype.update = function(patches) {
-    var _this = this;
-
-    this.adaptor.update(patches, function() {
-        _this.notifyUpdate();
-    });
 };
 
 RootPrototype.render = function(nextView, id) {
-    var node;
+    var transactions = this.__transactions,
+        patches = Patches.create(),
+        node;
 
     id = id || this.id;
     node = this.childHash[id];
 
     if (node) {
         if (shouldUpdate(node.renderedView, nextView)) {
-            node.update(nextView);
+
+            node.update(nextView, patches);
+
+            transactions[transactions.length] = patches;
+            this.__handle();
+
             return;
         } else {
-            node.unmount();
+            node.unmount(patches);
         }
     }
 
     node = Node.create(nextView);
     node.id = id;
     this.appendNode(node);
-    node.mount();
+    node.mount(patches);
+
+    transactions[transactions.length] = patches;
+    this.__handle();
 };

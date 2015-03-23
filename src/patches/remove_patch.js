@@ -8,20 +8,23 @@ module.exports = RemovePatch;
 function RemovePatch() {
     this.type = consts.REMOVE;
     this.id = null;
-    this.previous = null;
+    this.childId = null;
+    this.index = null;
 }
 createPool(RemovePatch);
 
-RemovePatch.create = function(id, previous) {
+RemovePatch.create = function(id, childId, index) {
     var patch = RemovePatch.getPooled();
     patch.id = id;
-    patch.previous = previous;
+    patch.childId = childId;
+    patch.index = index;
     return patch;
 };
 
 RemovePatch.prototype.destructor = function() {
     this.id = null;
-    this.previous = null;
+    this.childId = null;
+    this.index = null;
     return this;
 };
 

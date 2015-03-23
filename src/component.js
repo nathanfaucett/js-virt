@@ -38,27 +38,27 @@ ComponentPrototype.setState = function(state) {
     this.__previousState = this.state;
     this.state = extend({}, this.state, state);
 
-    node.update(node.renderedView);
+    node.root.render(node.renderedView, this.id);
 };
 
 ComponentPrototype.forceUpdate = function() {
     var node = this.__node;
-    node.update(node.renderedView);
+    node.root.render(node.renderedView, this.id);
 };
 
 ComponentPrototype.componentDidMount = function() {};
 
 ComponentPrototype.componentDidUnmount = function() {};
 
-ComponentPrototype.componentDidUpdate = function( /* previousProps, previousState */ ) {};
+ComponentPrototype.componentDidUpdate = function( /* previousProps, previousChildren, previousState */ ) {};
 
 ComponentPrototype.componentWillMount = function() {};
 
 ComponentPrototype.componentWillUnmount = function() {};
 
-ComponentPrototype.componentWillReceiveProps = function( /* nextProps */ ) {};
+ComponentPrototype.componentWillReceiveProps = function( /* nextProps, nextChildren */ ) {};
 
-ComponentPrototype.componentWillUpdate = function( /* nextProps, nextState */ ) {};
+ComponentPrototype.componentWillUpdate = function( /* nextProps, nextChildren, nextState */ ) {};
 
 ComponentPrototype.shouldComponentUpdate = function( /* nextProps, nextChildren, nextState */ ) {
     return true;

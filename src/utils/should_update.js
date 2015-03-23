@@ -1,6 +1,5 @@
 var isString = require("is_string"),
     isNumber = require("is_number"),
-    isObjectLike = require("is_object_like"),
     isNullOrUndefined = require("is_null_or_undefined");
 
 

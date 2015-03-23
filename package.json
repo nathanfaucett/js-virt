@@ -26,7 +26,6 @@
     "create_pool": "git://github.com/nathanfaucett/create_pool",
     "extend": "git://github.com/nathanfaucett/extend",
     "fast_slice": "git://github.com/nathanfaucett/fast_slice",
-    "for_each": "git://github.com/nathanfaucett/for_each",
     "get_prototype_of": "git://github.com/nathanfaucett/get_prototype_of",
     "has": "git://github.com/nathanfaucett/has",
     "index_of": "git://github.com/nathanfaucett/index_of",
@@ -40,6 +39,7 @@
     "is_primitive": "git://github.com/nathanfaucett/is_primitive",
     "is_string": "git://github.com/nathanfaucett/is_string",
     "key_mirror": "git://github.com/nathanfaucett/key_mirror",
-    "map": "git://github.com/nathanfaucett/map"
+    "map": "git://github.com/nathanfaucett/map",
+    "queue": "git://github.com/nathanfaucett/queue"
   }
 }

@@ -1,4 +1,5 @@
 var createPool = require("create_pool"),
+    Queue = require("queue"),
     consts = require("./consts"),
     InsertPatch = require("./insert_patch"),
     OrderPatch = require("./order_patch"),
@@ -12,6 +13,7 @@ module.exports = Patches;
 
 
 function Patches() {
+    this.queue = Queue.getPooled();
     this.ids = [];
     this.hash = null;
 }
@@ -61,8 +63,8 @@ Patches.prototype.destructor = function() {
     return this;
 };
 
-Patches.prototype.insert = function(id, index, next) {
-    return this.append(InsertPatch.create(id, index, next));
+Patches.prototype.insert = function(id, childId, index, next) {
+    return this.append(InsertPatch.create(id, childId, index, next));
 };
 
 Patches.prototype.order = function(id, order) {
@@ -73,16 +75,16 @@ Patches.prototype.props = function(id, previous, props) {
     return this.append(PropsPatch.create(id, previous, props));
 };
 
-Patches.prototype.remove = function(id, previous) {
-    return this.append(RemovePatch.create(id, previous));
+Patches.prototype.remove = function(id, childId, index) {
+    return this.append(RemovePatch.create(id, childId, index));
 };
 
-Patches.prototype.replace = function(id, index, previous, next) {
-    return this.append(ReplacePatch.create(id, index, previous, next));
+Patches.prototype.replace = function(id, childId, index, next) {
+    return this.append(ReplacePatch.create(id, childId, index, next));
 };
 
-Patches.prototype.text = function(id, index, text) {
-    return this.append(TextPatch.create(id, index, text));
+Patches.prototype.text = function(id, index, next) {
+    return this.append(TextPatch.create(id, index, next));
 };
 
 Patches.prototype.append = function(value) {
@@ -98,4 +100,11 @@ Patches.prototype.append = function(value) {
     patchArray[patchArray.length] = value;
 
     return this;
+};
+
+Patches.prototype.toJSON = function() {
+    return {
+        ids: this.ids,
+        hash: this.hash
+    };
 };

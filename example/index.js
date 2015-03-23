@@ -36,21 +36,17 @@ function renderCounter(count) {
 var root = global.root = new virt.Root();
 
 root.adaptor = {
-    mount: function(parentId, id, index, view, callback) {
-        callback();
-    },
-    unmount: function(parentId, id, callback) {
-        callback();
-    },
-    update: function(patches, callback) {
+    handle: function(patches, callback) {
         callback();
     }
 };
 
+root.render(renderCounter(0));
+
 var dir = 1,
     count = 0;
 
-(function render() {
+function render() {
     if (dir === 1 && count >= 5) {
         dir = -1;
     } else if (dir === -1 && count <= 0) {
@@ -61,4 +57,6 @@ var dir = 1,
 
     root.render(renderCounter(count));
     window.requestAnimationFrame(render, app);
-}());
+}
+
+//render();

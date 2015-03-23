@@ -1,73 +1,41 @@
 var getViewKey = require("./utils/get_view_key"),
+    shouldUpdate = require("./utils/should_update"),
     isNullOrUndefined = require("is_null_or_undefined"),
-    getPrototypeOf = require("get_prototype_of"),
-    isObject = require("is_object"),
     diffProps = require("./utils/diff_props"),
     View = require("./view"),
     Node;
 
 
-var isView = View.isView,
-    isPrimativeView = View.isPrimativeView;
+var isPrimativeView = View.isPrimativeView;
 
 
 module.exports = diff;
 
 
-function diff(root, node, previous, next, patches, id) {
+Node = require("./node");
+
+
+function diff(node, previous, next, patches) {
     var propsDiff = diffProps(previous.props, next.props);
 
     if (propsDiff !== null) {
-        patches.props(id, previous.props, propsDiff);
+        patches.props(node.id, previous.props, propsDiff);
     }
 
-    return diffChildren(root, node, previous, next, patches, id);
+    return diffChildren(node, previous, next, patches);
 }
 
-function diffChildren(root, node, previous, next, patches, parentId) {
+function diffChildren(node, previous, next, patches) {
     var previousChildren = previous.children,
         nextChildren = reorder(previousChildren, next.children),
         previousLength = previousChildren.length,
         nextLength = nextChildren.length,
+        parentId = node.id,
         i = -1,
-        il = (previousLength > nextLength ? previousLength : nextLength) - 1,
-        previousChild, nextChild, childNode, id;
+        il = (previousLength > nextLength ? previousLength : nextLength) - 1;
 
     while (i++ < il) {
-        previousChild = previousChildren[i];
-        nextChild = nextChildren[i];
-
-        if (isNullOrUndefined(previousChild)) {
-            if (!isNullOrUndefined(nextChild)) {
-                insert(node, nextChild, parentId, i);
-            }
-        } else if (isPrimativeView(previousChild)) {
-            if (isPrimativeView(nextChild)) {
-                if (previousChild !== nextChild) {
-                    patches.text(parentId, i, nextChild);
-                }
-            } else {
-                replace(node, nextChild, parentId, i);
-            }
-        } else {
-            if (isNullOrUndefined(nextChild)) {
-                id = parentId + "." + getViewKey(previousChild, i);
-                childNode = root.childHash[id];
-                childNode.unmount(i);
-            } else if (isPrimativeView(nextChild)) {
-                if (isPrimativeView(nextChild)) {
-                    if (previousChild !== nextChild) {
-                        patches.text(parentId, i, nextChild);
-                    }
-                } else {
-                    replace(node, nextChild, parentId, i);
-                }
-            } else {
-                id = parentId + "." + getViewKey(previousChild, i);
-                childNode = root.childHash[id];
-                childNode.__update(nextChild, patches);
-            }
-        }
+        diffChild(node, previousChildren[i], nextChildren[i], patches, parentId, i);
     }
 
     if (nextChildren.moves) {
@@ -75,22 +43,57 @@ function diffChildren(root, node, previous, next, patches, parentId) {
     }
 }
 
-Node = require("./node");
+function diffChild(parentNode, previousChild, nextChild, patches, parentId, index) {
+    var node, id;
 
-function insert(parentNode, nextChild, parentId, index) {
-    var node = Node.create(nextChild);
+    if (previousChild !== nextChild) {
+        if (isNullOrUndefined(previousChild)) {
+            if (isPrimativeView(nextChild)) {
+                patches.insert(parentId, null, index, nextChild);
+            } else {
+                node = Node.create(nextChild);
+                id = node.id = parentId + "." + getViewKey(nextChild, index);
+                parentNode.appendNode(node);
+                patches.insert(parentId, id, index, node.__renderRecurse(patches));
+            }
+        } else if (isPrimativeView(previousChild)) {
+            if (isNullOrUndefined(nextChild)) {
+                patches.remove(parentId, null, index);
+            } else if (isPrimativeView(nextChild)) {
+                patches.text(parentId, index, nextChild);
+            } else {
+                node = Node.create(nextChild);
+                id = node.id = parentId + "." + getViewKey(nextChild, index);
+                parentNode.appendNode(node);
+                patches.replace(parentId, id, index, node.__renderRecurse(patches));
+            }
+        } else {
+            if (isNullOrUndefined(nextChild)) {
+                id = parentId + "." + getViewKey(previousChild, index);
+                node = parentNode.root.childHash[id];
+                node.unmount(patches);
+            } else if (isPrimativeView(nextChild)) {
+                patches.replace(parentId, null, index, nextChild);
+            } else {
+                id = parentId + "." + getViewKey(previousChild, index);
+                node = parentNode.root.childHash[id];
 
-    node.id = parentId + "." + getViewKey(nextChild, index);
-    parentNode.appendNode(node);
-    node.mount(index);
-}
+                if (node) {
+                    if (shouldUpdate(previousChild, nextChild)) {
+                        node.update(nextChild, patches);
+                        return;
+                    } else {
+                        node.unmount(patches);
+                    }
+                }
 
-function replace(parentNode, nextChild, parentId, index) {
-    var node = Node.create(nextChild);
-
-    node.id = parentId + "." + getViewKey(nextChild, index);
-    parentNode.appendNode(node);
-    node.mount(index);
+                node = Node.create(nextChild);
+                id = node.id = parentId + "." + getViewKey(nextChild, index);
+                parentNode.appendNode(node);
+                patches.insert(parentId, id, index, node.__renderRecurse(patches));
+            }
+        }
+    }
 }
 
 function reorder(previousChildren, nextChildren) {
@@ -186,7 +189,7 @@ function keyIndex(children) {
     while (i++ < il) {
         child = children[i];
 
-        if (child.key != null) {
+        if (!isNullOrUndefined(child.key)) {
             keys = keys || {};
             keys[child.key] = i;
         }

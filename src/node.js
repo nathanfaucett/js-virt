@@ -1,9 +1,7 @@
 var indexOf = require("index_of"),
     map = require("map"),
-    forEach = require("for_each"),
     isFunction = require("is_function"),
     getComponentClassForType = require("./utils/get_component_class_for_type"),
-    Patches = require("./patches"),
     View = require("./view"),
     getViewKey = require("./utils/get_view_key"),
     diff;
@@ -53,29 +51,39 @@ NodePrototype.appendNode = function(node) {
     this.root.appendNode(node);
 };
 
-NodePrototype.removeNode = function(node) {
+NodePrototype.removeNode = function(node, patches) {
     var children = this.children,
         nodeChildren = node.children,
         i = -1,
         il = nodeChildren.length - 1;
 
     while (i++ < il) {
-        node.removeNode(nodeChildren[i]);
+        node.removeNode(nodeChildren[i], patches);
     }
 
+    node.__unmount(patches);
     node.parent = null;
     children.splice(indexOf(children, node), 1);
     this.root.removeNode(node);
 };
 
-NodePrototype.mount = function(index) {
-    this.root.mount(this.parent ? this.parent.id : null, this.id, index || 0, this.__mount());
+NodePrototype.mount = function(patches) {
+    patches.insert(this.parent ? this.parent.id : this.id, this.id, 0, this.__renderRecurse(patches));
 };
 
-NodePrototype.__mount = function() {
+NodePrototype.__mount = function(patches) {
+    var component = this.component;
+
+    component.componentWillMount();
+
+    patches.queue.enqueue(function onMount() {
+        component.componentDidMount();
+    });
+};
+
+NodePrototype.__renderRecurse = function(patches) {
     var _this = this,
         parentId = this.id,
-        component = this.component,
         renderedView = this.render();
 
     renderedView.children = map(renderedView.children, function(child, index) {
@@ -88,54 +96,41 @@ NodePrototype.__mount = function() {
             node.id = parentId + "." + getViewKey(child, index);
             _this.appendNode(node);
 
-            return node.__mount();
+            return node.__renderRecurse(patches);
         }
     });
 
     this.renderedView = renderedView;
-
-    component.componentWillMount();
-
-    this.root.onMount(function onMount() {
-        component.componentDidMount();
-    });
+    this.__mount(patches);
 
     return renderedView;
 };
 
-NodePrototype.unmount = function() {
-
-    this.__unmount();
+NodePrototype.unmount = function(patches) {
+    var parentId = this.parent ? this.parent.id : this.id;
 
     if (this.parent !== null) {
-        this.parent.removeNode(this);
+        this.parent.removeNode(this, patches);
     } else {
         this.root.removeNode(this);
     }
 
-    this.root.unmount(this.parent ? this.parent.id : null, this.id);
+    patches.remove(parentId, this.id, 0);
 };
 
-NodePrototype.__unmount = function() {
+NodePrototype.__unmount = function(patches) {
     var component = this.component;
 
     component.componentWillUnmount();
 
-    this.root.onUnmount(function onUnmount() {
+    patches.queue.enqueue(function onUnmount() {
         component.componentDidUnmount();
     });
 };
 
-NodePrototype.update = function(nextView) {
-    var patches = Patches.create();
-
-    this.__update(nextView, patches);
-    this.root.update(patches);
-};
-
 diff = require("./diff");
 
-NodePrototype.__update = function(nextView, patches) {
+NodePrototype.update = function(nextView, patches) {
     var component = this.component,
 
         nextState = component.state,
@@ -154,17 +149,18 @@ NodePrototype.__update = function(nextView, patches) {
 
         component.props = nextProps;
         component.children = nextChildren;
+
         component.componentWillUpdate();
 
         renderedView = this.render();
-        diff(this.root, this, this.renderedView, renderedView, patches, this.id);
+        diff(this, this.renderedView, renderedView, patches);
         this.renderedView = renderedView;
     } else {
         component.props = nextProps;
         component.children = nextChildren;
     }
 
-    this.root.onUpdate(function onUpdate() {
+    patches.queue.enqueue(function onUpdate() {
         component.componentDidUpdate(previousProps, previousChildren, previousState);
     });
 };

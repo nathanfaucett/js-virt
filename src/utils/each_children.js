@@ -5,7 +5,10 @@ var View = require("../view"),
 var isPrimativeView = View.isPrimativeView;
 
 
-module.exports = function eachChildren(parentId, children, fn) {
+module.exports = eachChildren;
+
+
+function eachChildren(parentId, children, fn) {
     var i = -1,
         il = children.length - 1,
         child, id;

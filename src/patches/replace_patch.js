@@ -8,26 +8,26 @@ module.exports = ReplacePatch;
 function ReplacePatch() {
     this.type = consts.REPLACE;
     this.id = null;
+    this.childId = null;
     this.index = null;
-    this.previous = null;
-    this.current = null;
+    this.next = null;
 }
 createPool(ReplacePatch);
 
-ReplacePatch.create = function(id, index, previous, current) {
+ReplacePatch.create = function(id, childId, index, next) {
     var patch = ReplacePatch.getPooled();
     patch.id = id;
+    patch.childId = childId;
     patch.index = index;
-    patch.previous = previous;
-    patch.current = current;
+    patch.next = next;
     return patch;
 };
 
 ReplacePatch.prototype.destructor = function() {
     this.id = null;
+    this.childId = null;
     this.index = null;
-    this.previous = null;
-    this.current = null;
+    this.next = null;
     return this;
 };
 
