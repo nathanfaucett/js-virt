@@ -15,17 +15,17 @@ module.exports = diff;
 Node = require("./node");
 
 
-function diff(node, previous, next, patches) {
+function diff(node, previous, next, transaction) {
     var propsDiff = diffProps(previous.props, next.props);
 
     if (propsDiff !== null) {
-        patches.props(node.id, previous.props, propsDiff);
+        transaction.props(node.id, previous.props, propsDiff);
     }
 
-    return diffChildren(node, previous, next, patches);
+    return diffChildren(node, previous, next, transaction);
 }
 
-function diffChildren(node, previous, next, patches) {
+function diffChildren(node, previous, next, transaction) {
     var previousChildren = previous.children,
         nextChildren = reorder(previousChildren, next.children),
         previousLength = previousChildren.length,
@@ -35,62 +35,62 @@ function diffChildren(node, previous, next, patches) {
         il = (previousLength > nextLength ? previousLength : nextLength) - 1;
 
     while (i++ < il) {
-        diffChild(node, previousChildren[i], nextChildren[i], patches, parentId, i);
+        diffChild(node, previousChildren[i], nextChildren[i], transaction, parentId, i);
     }
 
     if (nextChildren.moves) {
-        patches.order(parentId, nextChildren.moves);
+        transaction.order(parentId, nextChildren.moves);
     }
 }
 
-function diffChild(parentNode, previousChild, nextChild, patches, parentId, index) {
+function diffChild(parentNode, previousChild, nextChild, transaction, parentId, index) {
     var node, id;
 
     if (previousChild !== nextChild) {
         if (isNullOrUndefined(previousChild)) {
             if (isPrimativeView(nextChild)) {
-                patches.insert(parentId, null, index, nextChild);
+                transaction.insert(parentId, null, index, nextChild);
             } else {
                 node = Node.create(nextChild);
                 id = node.id = parentId + "." + getViewKey(nextChild, index);
                 parentNode.appendNode(node);
-                patches.insert(parentId, id, index, node.__renderRecurse(patches));
+                transaction.insert(parentId, id, index, node.__renderRecurse(transaction));
             }
         } else if (isPrimativeView(previousChild)) {
             if (isNullOrUndefined(nextChild)) {
-                patches.remove(parentId, null, index);
+                transaction.remove(parentId, null, index);
             } else if (isPrimativeView(nextChild)) {
-                patches.text(parentId, index, nextChild);
+                transaction.text(parentId, index, nextChild);
             } else {
                 node = Node.create(nextChild);
                 id = node.id = parentId + "." + getViewKey(nextChild, index);
                 parentNode.appendNode(node);
-                patches.replace(parentId, id, index, node.__renderRecurse(patches));
+                transaction.replace(parentId, id, index, node.__renderRecurse(transaction));
             }
         } else {
             if (isNullOrUndefined(nextChild)) {
                 id = parentId + "." + getViewKey(previousChild, index);
                 node = parentNode.root.childHash[id];
-                node.unmount(patches);
+                node.unmount(transaction);
             } else if (isPrimativeView(nextChild)) {
-                patches.replace(parentId, null, index, nextChild);
+                transaction.replace(parentId, null, index, nextChild);
             } else {
                 id = parentId + "." + getViewKey(previousChild, index);
                 node = parentNode.root.childHash[id];
 
                 if (node) {
                     if (shouldUpdate(previousChild, nextChild)) {
-                        node.update(nextChild, patches);
+                        node.update(nextChild, transaction);
                         return;
                     } else {
-                        node.unmount(patches);
+                        node.unmount(transaction);
                     }
                 }
 
                 node = Node.create(nextChild);
                 id = node.id = parentId + "." + getViewKey(nextChild, index);
                 parentNode.appendNode(node);
-                patches.insert(parentId, id, index, node.__renderRecurse(patches));
+                transaction.insert(parentId, id, index, node.__renderRecurse(transaction));
             }
         }
     }

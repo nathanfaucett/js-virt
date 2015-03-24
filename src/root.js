@@ -1,4 +1,4 @@
-var Patches = require("./patches"),
+var Transaction = require("./transaction"),
     shouldUpdate = require("./utils/should_update"),
     Node = require("./node");
 
@@ -49,15 +49,15 @@ RootPrototype.removeNode = function(node) {
 RootPrototype.__handle = function() {
     var _this = this,
         transactions = this.__transactions,
-        patches;
+        transaction;
 
     if (transactions.length !== 0 && this.__currentTransaction === null) {
-        this.__currentTransaction = patches = transactions.shift();
+        this.__currentTransaction = transaction = transactions.shift();
 
-        this.adaptor.handle(patches, function() {
+        this.adaptor.handle(transaction, function() {
 
-            patches.queue.notifyAll();
-            patches.destroy();
+            transaction.queue.notifyAll();
+            transaction.destroy();
 
             _this.__currentTransaction = null;
             _this.__handle();
@@ -65,9 +65,18 @@ RootPrototype.__handle = function() {
     }
 };
 
+RootPrototype.update = function(node) {
+    var transactions = this.__transactions,
+        transaction = Transaction.create();
+
+    node.update(node.currentView, transaction);
+    transactions[transactions.length] = transaction;
+    this.__handle();
+};
+
 RootPrototype.render = function(nextView, id) {
     var transactions = this.__transactions,
-        patches = Patches.create(),
+        transaction = Transaction.create(),
         node;
 
     id = id || this.id;
@@ -76,22 +85,22 @@ RootPrototype.render = function(nextView, id) {
     if (node) {
         if (shouldUpdate(node.renderedView, nextView)) {
 
-            node.update(nextView, patches);
+            node.update(nextView, transaction);
 
-            transactions[transactions.length] = patches;
+            transactions[transactions.length] = transaction;
             this.__handle();
 
             return;
         } else {
-            node.unmount(patches);
+            node.unmount(transaction);
         }
     }
 
     node = Node.create(nextView);
     node.id = id;
     this.appendNode(node);
-    node.mount(patches);
+    node.mount(transaction);
 
-    transactions[transactions.length] = patches;
+    transactions[transactions.length] = transaction;
     this.__handle();
 };

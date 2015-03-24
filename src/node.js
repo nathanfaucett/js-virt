@@ -51,37 +51,37 @@ NodePrototype.appendNode = function(node) {
     this.root.appendNode(node);
 };
 
-NodePrototype.removeNode = function(node, patches) {
+NodePrototype.removeNode = function(node, transaction) {
     var children = this.children,
         nodeChildren = node.children,
         i = -1,
         il = nodeChildren.length - 1;
 
     while (i++ < il) {
-        node.removeNode(nodeChildren[i], patches);
+        node.removeNode(nodeChildren[i], transaction);
     }
 
-    node.__unmount(patches);
+    node.__unmount(transaction);
     node.parent = null;
     children.splice(indexOf(children, node), 1);
     this.root.removeNode(node);
 };
 
-NodePrototype.mount = function(patches) {
-    patches.insert(this.parent ? this.parent.id : this.id, this.id, 0, this.__renderRecurse(patches));
+NodePrototype.mount = function(transaction) {
+    transaction.insert(this.parent ? this.parent.id : this.id, this.id, 0, this.__renderRecurse(transaction));
 };
 
-NodePrototype.__mount = function(patches) {
+NodePrototype.__mount = function(transaction) {
     var component = this.component;
 
     component.componentWillMount();
 
-    patches.queue.enqueue(function onMount() {
+    transaction.queue.enqueue(function onMount() {
         component.componentDidMount();
     });
 };
 
-NodePrototype.__renderRecurse = function(patches) {
+NodePrototype.__renderRecurse = function(transaction) {
     var _this = this,
         parentId = this.id,
         renderedView = this.render();
@@ -96,51 +96,60 @@ NodePrototype.__renderRecurse = function(patches) {
             node.id = parentId + "." + getViewKey(child, index);
             _this.appendNode(node);
 
-            return node.__renderRecurse(patches);
+            return node.__renderRecurse(transaction);
         }
     });
 
     this.renderedView = renderedView;
-    this.__mount(patches);
+    this.__mount(transaction);
 
     return renderedView;
 };
 
-NodePrototype.unmount = function(patches) {
+NodePrototype.unmount = function(transaction) {
     var parentId = this.parent ? this.parent.id : this.id;
 
     if (this.parent !== null) {
-        this.parent.removeNode(this, patches);
+        this.parent.removeNode(this, transaction);
     } else {
         this.root.removeNode(this);
     }
 
-    patches.remove(parentId, this.id, 0);
+    transaction.remove(parentId, this.id, 0);
 };
 
-NodePrototype.__unmount = function(patches) {
+NodePrototype.__unmount = function(transaction) {
     var component = this.component;
 
     component.componentWillUnmount();
 
-    patches.queue.enqueue(function onUnmount() {
+    transaction.queue.enqueue(function onUnmount() {
         component.componentDidUnmount();
     });
 };
 
 diff = require("./diff");
 
-NodePrototype.update = function(nextView, patches) {
+NodePrototype.update = function(nextView, transaction) {
+    var component = this.component;
+
+    this.__update(
+        component.props, nextView.props,
+        component.children, nextView.children,
+        component.__previousState, component.state,
+        nextView,
+        transaction
+    );
+};
+
+NodePrototype.__update = function(
+    previousProps, nextProps,
+    previousChildren, nextChildren,
+    previousState, nextState,
+    currentView,
+    transaction
+) {
     var component = this.component,
-
-        nextState = component.state,
-        nextProps = nextView.props,
-        nextChildren = nextView.children,
-
-        previousProps = component.props,
-        previousChildren = component.children,
-        previousState = component.__previousState,
-
         renderedView;
 
     component.componentWillReceiveProps(nextProps, nextChildren);
@@ -153,14 +162,16 @@ NodePrototype.update = function(nextView, patches) {
         component.componentWillUpdate();
 
         renderedView = this.render();
-        diff(this, this.renderedView, renderedView, patches);
+        diff(this, this.renderedView, renderedView, transaction);
         this.renderedView = renderedView;
     } else {
         component.props = nextProps;
         component.children = nextChildren;
     }
 
-    patches.queue.enqueue(function onUpdate() {
+    this.currentView = currentView;
+
+    transaction.queue.enqueue(function onUpdate() {
         component.componentDidUpdate(previousProps, previousChildren, previousState);
     });
 };

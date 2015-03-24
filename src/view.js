@@ -105,13 +105,17 @@ function propsToJSON(props) {
     var localHas = has,
         localEvents = events,
         out = {},
-        key;
+        key, value;
 
     for (key in props) {
-        if (localHas(localEvents, key)) {
-            out[key] = true;
-        } else {
-            out[key] = props[key];
+        if (localHas(props, key)) {
+            value = props[key];
+
+            if (localHas(localEvents, key)) {
+                out[key] = true;
+            } else if (!isFunction(value)) {
+                out[key] = value;
+            }
         }
     }
 

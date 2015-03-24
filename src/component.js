@@ -38,12 +38,12 @@ ComponentPrototype.setState = function(state) {
     this.__previousState = this.state;
     this.state = extend({}, this.state, state);
 
-    node.root.render(node.renderedView, this.id);
+    node.root.update(node);
 };
 
 ComponentPrototype.forceUpdate = function() {
     var node = this.__node;
-    node.root.render(node.renderedView, this.id);
+    node.root.update(node);
 };
 
 ComponentPrototype.componentDidMount = function() {};
