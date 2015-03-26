@@ -14,6 +14,7 @@ function Component(props, children) {
     this.props = props;
     this.children = children;
     this.state = null;
+    this.refs = null;
 }
 
 ComponentPrototype = Component.prototype;

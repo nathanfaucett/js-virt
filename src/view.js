@@ -7,7 +7,7 @@ var isPrimitive = require("is_primitive"),
     fastSlice = require("fast_slice"),
     has = require("has"),
     map = require("map"),
-    events = require("./events");
+    events = require("./event/events");
 
 
 var ViewPrototype;

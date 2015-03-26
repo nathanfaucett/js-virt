@@ -1,6 +1,8 @@
 var indexOf = require("index_of"),
     map = require("map"),
+    has = require("has"),
     isFunction = require("is_function"),
+    events = require("./event/events"),
     getComponentClassForType = require("./utils/get_component_class_for_type"),
     View = require("./view"),
     getViewKey = require("./utils/get_view_key"),
@@ -72,7 +74,10 @@ NodePrototype.mount = function(transaction) {
 };
 
 NodePrototype.__mount = function(transaction) {
-    var component = this.component;
+    var component = this.component,
+        renderedView = this.renderedView;
+
+    mountEvents(this.id, renderedView.props, this.root.eventManager);
 
     component.componentWillMount();
 
@@ -119,7 +124,10 @@ NodePrototype.unmount = function(transaction) {
 };
 
 NodePrototype.__unmount = function(transaction) {
-    var component = this.component;
+    var component = this.component,
+        renderedView = this.renderedView;
+
+    unmountEvents(this.id, renderedView.props, this.root.eventManager);
 
     component.componentWillUnmount();
 
@@ -127,8 +135,6 @@ NodePrototype.__unmount = function(transaction) {
         component.componentDidUnmount();
     });
 };
-
-diff = require("./diff");
 
 NodePrototype.update = function(nextView, transaction) {
     var component = this.component;
@@ -141,6 +147,8 @@ NodePrototype.update = function(nextView, transaction) {
         transaction
     );
 };
+
+diff = require("./diff");
 
 NodePrototype.__update = function(
     previousProps, nextProps,
@@ -185,3 +193,23 @@ NodePrototype.render = function() {
 
     return renderedView;
 };
+
+function mountEvents(id, props, eventManager) {
+    var key;
+
+    for (key in props) {
+        if (has(events, key)) {
+            eventManager.on(id, events[key], props[key]);
+        }
+    }
+}
+
+function unmountEvents(id, props, eventManager) {
+    var key;
+
+    for (key in props) {
+        if (has(events, key)) {
+            eventManager.off(id, events[key], props[key]);
+        }
+    }
+}

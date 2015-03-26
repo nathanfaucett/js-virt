@@ -33,13 +33,11 @@ function renderCounter(count) {
     );
 }
 
-var root = global.root = new virt.Root();
-
-root.adaptor = {
-    handle: function(patches, callback) {
+var root = global.root = new virt.Root({
+    handle: function(transaction, callback) {
         callback();
     }
-};
+});
 
 root.render(renderCounter(0));
 

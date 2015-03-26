@@ -1,5 +1,6 @@
 var Transaction = require("./transaction"),
     shouldUpdate = require("./utils/should_update"),
+    EventManager = require("./event/event_manager"),
     Node = require("./node");
 
 
@@ -10,11 +11,15 @@ var RootPrototype,
 module.exports = Root;
 
 
-function Root() {
+function Root(adaptor) {
 
     this.id = "." + (ROOT_ID++).toString(36);
     this.childHash = {};
-    this.adaptor = null;
+
+    this.eventManager = new EventManager(this);
+
+    this.adaptor = adaptor;
+    adaptor.root = this;
 
     this.__transactions = [];
     this.__currentTransaction = null;
@@ -46,12 +51,16 @@ RootPrototype.removeNode = function(node) {
     }
 };
 
-RootPrototype.__handle = function() {
+RootPrototype.handleEvent = function(id, type, event) {
+    this.eventManager.emit(id, type, event);
+};
+
+RootPrototype.handle = function() {
     var _this = this,
         transactions = this.__transactions,
         transaction;
 
-    if (transactions.length !== 0 && this.__currentTransaction === null) {
+    if (this.__currentTransaction === null && transactions.length !== 0) {
         this.__currentTransaction = transaction = transactions.shift();
 
         this.adaptor.handle(transaction, function() {
@@ -60,18 +69,29 @@ RootPrototype.__handle = function() {
             transaction.destroy();
 
             _this.__currentTransaction = null;
-            _this.__handle();
+            _this.handle();
         });
     }
 };
 
 RootPrototype.update = function(node) {
     var transactions = this.__transactions,
-        transaction = Transaction.create();
+        transaction = Transaction.create(),
 
-    node.update(node.currentView, transaction);
+        component = node.component,
+        renderedView = node.renderedView,
+        currentView = node.currentView;
+
+    node.__update(
+        component.props, renderedView.props,
+        component.children, renderedView.children,
+        component.__previousState, component.state,
+        currentView,
+        transaction
+    );
+
     transactions[transactions.length] = transaction;
-    this.__handle();
+    this.handle();
 };
 
 RootPrototype.render = function(nextView, id) {
@@ -88,7 +108,7 @@ RootPrototype.render = function(nextView, id) {
             node.update(nextView, transaction);
 
             transactions[transactions.length] = transaction;
-            this.__handle();
+            this.handle();
 
             return;
         } else {
@@ -102,5 +122,5 @@ RootPrototype.render = function(nextView, id) {
     node.mount(transaction);
 
     transactions[transactions.length] = transaction;
-    this.__handle();
+    this.handle();
 };

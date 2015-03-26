@@ -16,10 +16,11 @@ Node = require("./node");
 
 
 function diff(node, previous, next, transaction) {
-    var propsDiff = diffProps(previous.props, next.props);
+    var id = node.id,
+        propsDiff = diffProps(id, node.root.eventManager, previous.props, next.props);
 
     if (propsDiff !== null) {
-        transaction.props(node.id, previous.props, propsDiff);
+        transaction.props(id, previous.props, propsDiff);
     }
 
     return diffChildren(node, previous, next, transaction);
