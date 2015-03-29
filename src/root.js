@@ -1,6 +1,6 @@
 var Transaction = require("./transaction"),
     shouldUpdate = require("./utils/should_update"),
-    EventManager = require("./event/event_manager"),
+    EventManager = require("./event_manager"),
     Node = require("./node");
 
 
@@ -11,15 +11,14 @@ var RootPrototype,
 module.exports = Root;
 
 
-function Root(adaptor) {
+function Root() {
 
     this.id = "." + (ROOT_ID++).toString(36);
     this.childHash = {};
 
-    this.eventManager = new EventManager(this);
+    this.eventManager = new EventManager();
 
-    this.adaptor = adaptor;
-    adaptor.root = this;
+    this.adaptor = null;
 
     this.__transactions = [];
     this.__currentTransaction = null;
@@ -51,33 +50,36 @@ RootPrototype.removeNode = function(node) {
     }
 };
 
-RootPrototype.handleEvent = function(id, type, event) {
-    this.eventManager.emit(id, type, event);
-};
-
-RootPrototype.handle = function() {
+RootPrototype.__processTransaction = function() {
     var _this = this,
         transactions = this.__transactions,
         transaction;
 
     if (this.__currentTransaction === null && transactions.length !== 0) {
-        this.__currentTransaction = transaction = transactions.shift();
+        this.__currentTransaction = transaction = transactions[0];
 
         this.adaptor.handle(transaction, function() {
+            transactions.splice(0, 1);
 
             transaction.queue.notifyAll();
             transaction.destroy();
 
             _this.__currentTransaction = null;
-            _this.handle();
+
+            if (transactions.length !== 0) {
+                _this.__processTransaction();
+            }
         });
     }
 };
 
-RootPrototype.update = function(node) {
-    var transactions = this.__transactions,
-        transaction = Transaction.create(),
+RootPrototype.__enqueueTransaction = function(transaction) {
+    var transactions = this.__transactions;
+    transactions[transactions.length] = transaction;
+};
 
+RootPrototype.update = function(node) {
+    var transaction = Transaction.create(),
         component = node.component,
         renderedView = node.renderedView,
         currentView = node.currentView;
@@ -90,13 +92,12 @@ RootPrototype.update = function(node) {
         transaction
     );
 
-    transactions[transactions.length] = transaction;
-    this.handle();
+    this.__enqueueTransaction(transaction);
+    this.__processTransaction();
 };
 
 RootPrototype.render = function(nextView, id) {
-    var transactions = this.__transactions,
-        transaction = Transaction.create(),
+    var transaction = Transaction.create(),
         node;
 
     id = id || this.id;
@@ -106,9 +107,8 @@ RootPrototype.render = function(nextView, id) {
         if (shouldUpdate(node.renderedView, nextView)) {
 
             node.update(nextView, transaction);
-
-            transactions[transactions.length] = transaction;
-            this.handle();
+            this.__enqueueTransaction(transaction);
+            this.__processTransaction();
 
             return;
         } else {
@@ -121,6 +121,6 @@ RootPrototype.render = function(nextView, id) {
     this.appendNode(node);
     node.mount(transaction);
 
-    transactions[transactions.length] = transaction;
-    this.handle();
+    this.__enqueueTransaction(transaction);
+    this.__processTransaction();
 };

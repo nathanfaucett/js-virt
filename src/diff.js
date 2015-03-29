@@ -1,7 +1,7 @@
 var getViewKey = require("./utils/get_view_key"),
     shouldUpdate = require("./utils/should_update"),
     isNullOrUndefined = require("is_null_or_undefined"),
-    diffProps = require("./utils/diff_props"),
+    diffProps = require("./diff_props"),
     View = require("./view"),
     Node;
 
@@ -17,7 +17,7 @@ Node = require("./node");
 
 function diff(node, previous, next, transaction) {
     var id = node.id,
-        propsDiff = diffProps(id, node.root.eventManager, previous.props, next.props);
+        propsDiff = diffProps(id, node.root.eventManager, transaction, previous.props, next.props);
 
     if (propsDiff !== null) {
         transaction.props(id, previous.props, propsDiff);

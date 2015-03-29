@@ -1,8 +1,6 @@
 var indexOf = require("index_of"),
     map = require("map"),
-    has = require("has"),
     isFunction = require("is_function"),
-    events = require("./event/events"),
     getComponentClassForType = require("./utils/get_component_class_for_type"),
     View = require("./view"),
     getViewKey = require("./utils/get_view_key"),
@@ -18,10 +16,14 @@ module.exports = Node;
 
 function Node() {
     this.id = null;
+
     this.parent = null;
     this.children = [];
     this.root = null;
+
     this.component = null;
+
+    this.renderedView = null;
     this.currentView = null;
 }
 
@@ -54,19 +56,23 @@ NodePrototype.appendNode = function(node) {
 };
 
 NodePrototype.removeNode = function(node, transaction) {
-    var children = this.children,
-        nodeChildren = node.children,
-        i = -1,
-        il = nodeChildren.length - 1;
+    var children = this.children;
 
-    while (i++ < il) {
-        node.removeNode(nodeChildren[i], transaction);
-    }
-
+    node.removeChildren(transaction);
     node.__unmount(transaction);
     node.parent = null;
     children.splice(indexOf(children, node), 1);
     this.root.removeNode(node);
+};
+
+NodePrototype.removeChildren = function(transaction) {
+    var children = this.children,
+        i = -1,
+        il = children.length - 1;
+
+    while (i++ < il) {
+        this.removeNode(children[i], transaction);
+    }
 };
 
 NodePrototype.mount = function(transaction) {
@@ -77,7 +83,7 @@ NodePrototype.__mount = function(transaction) {
     var component = this.component,
         renderedView = this.renderedView;
 
-    mountEvents(this.id, renderedView.props, this.root.eventManager);
+    mountEvents(this.id, renderedView.props, this.root.eventManager, transaction);
 
     component.componentWillMount();
 
@@ -117,6 +123,7 @@ NodePrototype.unmount = function(transaction) {
     if (this.parent !== null) {
         this.parent.removeNode(this, transaction);
     } else {
+        this.removeChildren(transaction);
         this.root.removeNode(this);
     }
 
@@ -124,16 +131,11 @@ NodePrototype.unmount = function(transaction) {
 };
 
 NodePrototype.__unmount = function(transaction) {
-    var component = this.component,
-        renderedView = this.renderedView;
+    var component = this.component;
 
-    unmountEvents(this.id, renderedView.props, this.root.eventManager);
+    this.root.eventManager.allOff(this.id, transaction);
 
     component.componentWillUnmount();
-
-    transaction.queue.enqueue(function onUnmount() {
-        component.componentDidUnmount();
-    });
 };
 
 NodePrototype.update = function(nextView, transaction) {
@@ -194,22 +196,13 @@ NodePrototype.render = function() {
     return renderedView;
 };
 
-function mountEvents(id, props, eventManager) {
-    var key;
+function mountEvents(id, props, eventManager, transaction) {
+    var eventPropNames = eventManager.propNames,
+        key;
 
     for (key in props) {
-        if (has(events, key)) {
-            eventManager.on(id, events[key], props[key]);
-        }
-    }
-}
-
-function unmountEvents(id, props, eventManager) {
-    var key;
-
-    for (key in props) {
-        if (has(events, key)) {
-            eventManager.off(id, events[key], props[key]);
+        if (indexOf(eventPropNames, key) !== -1) {
+            eventManager.on(id, key, props[key], transaction);
         }
     }
 }

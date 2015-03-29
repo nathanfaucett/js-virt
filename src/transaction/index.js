@@ -16,11 +16,11 @@ function Transaction() {
 
     this.queue = Queue.getPooled();
 
-    this.removeIds = [];
-    this.removeHash = {};
+    this.removes = {};
+    this.patches = {};
 
-    this.patchIds = [];
-    this.patchHash = {};
+    this.events = {};
+    this.eventsRemove = {};
 }
 createPool(Transaction);
 Transaction.consts = consts;
@@ -33,82 +33,92 @@ Transaction.prototype.destroy = function() {
     Transaction.release(this);
 };
 
-function clearTransaction(ids, hash) {
-    var i = -1,
-        il = ids.length - 1,
-        index, transaction, j, jl;
+function clearPatches(hash) {
+    var id, array, j, jl;
 
-    while (i++ < il) {
-        index = ids[i];
-        transaction = hash[index];
+    for (id in hash) {
+        if ((array = hash[id]) !== undefined) {
+            j = -1;
+            jl = array.length - 1;
 
-        j = -1;
-        jl = transaction.length - 1;
-        while (j++ < jl) {
-            transaction[j].destroy();
+            while (j++ < jl) {
+                array[j].destroy();
+            }
+
+            delete hash[id];
         }
-
-        delete hash[index];
     }
+}
 
-    ids.length = 0;
+function clearHash(hash) {
+    for (var id in hash) {
+        if (hash[id] !== undefined) {
+            delete hash[id];
+        }
+    }
 }
 
 Transaction.prototype.destructor = function() {
-    clearTransaction(this.patchIds, this.patchHash);
-    clearTransaction(this.removeIds, this.removeHash);
+    clearPatches(this.patches);
+    clearPatches(this.removes);
+    clearHash(this.events);
+    clearHash(this.eventsRemove);
     return this;
 };
 
 Transaction.prototype.insert = function(id, childId, index, next) {
-    return this.append(InsertPatch.create(id, childId, index, next));
+    this.append(InsertPatch.create(id, childId, index, next));
 };
 
 Transaction.prototype.order = function(id, order) {
-    return this.append(OrderPatch.create(id, order));
+    this.append(OrderPatch.create(id, order));
 };
 
 Transaction.prototype.props = function(id, previous, props) {
-    return this.append(PropsPatch.create(id, previous, props));
+    this.append(PropsPatch.create(id, previous, props));
 };
 
 Transaction.prototype.replace = function(id, childId, index, next) {
-    return this.append(ReplacePatch.create(id, childId, index, next));
+    this.append(ReplacePatch.create(id, childId, index, next));
 };
 
 Transaction.prototype.text = function(id, index, next) {
-    return this.append(TextPatch.create(id, index, next));
+    this.append(TextPatch.create(id, index, next));
 };
 
 Transaction.prototype.remove = function(id, childId, index) {
-    return this.appendRemove(RemovePatch.create(id, childId, index));
+    this.appendRemove(RemovePatch.create(id, childId, index));
 };
 
-function append(ids, hash, value) {
-    var id = value.id,
-        patchArray = hash[id];
+Transaction.prototype.event = function(id, type) {
+    this.events[id] = type;
+};
 
-    if (!patchArray) {
-        patchArray = hash[id] = [];
-        ids[ids.length] = id;
-    }
+Transaction.prototype.removeEvent = function(id, type) {
+    this.eventsRemove[id] = type;
+};
+
+function append(hash, value) {
+    var id = value.id,
+        patchArray = hash[id] || (hash[id] = []);
 
     patchArray[patchArray.length] = value;
 }
 
 Transaction.prototype.append = function(value) {
-    append(this.patchIds, this.patchHash, value);
+    append(this.patches, value);
 };
 
 Transaction.prototype.appendRemove = function(value) {
-    append(this.removeIds, this.removeHash, value);
+    append(this.removes, value);
 };
 
 Transaction.prototype.toJSON = function() {
     return {
-        removeIds: this.removeIds,
-        removeHash: this.removeHash,
-        patchIds: this.patchIds,
-        patchHash: this.patchHash
+        removes: this.removes,
+        patches: this.patches,
+
+        events: this.events,
+        eventsRemove: this.eventsRemove
     };
 };

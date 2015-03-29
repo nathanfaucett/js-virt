@@ -49,8 +49,6 @@ ComponentPrototype.forceUpdate = function() {
 
 ComponentPrototype.componentDidMount = function() {};
 
-ComponentPrototype.componentDidUnmount = function() {};
-
 ComponentPrototype.componentDidUpdate = function( /* previousProps, previousChildren, previousState */ ) {};
 
 ComponentPrototype.componentWillMount = function() {};
