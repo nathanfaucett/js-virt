@@ -29,8 +29,6 @@ Component.extend = function(child, displayName) {
 };
 
 ComponentPrototype.displayName = "Component";
-ComponentPrototype.propTypes = {};
-ComponentPrototype.contextTypes = {};
 
 ComponentPrototype.render = function() {
     throw new Error("render() render must be defined on Components");

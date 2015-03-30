@@ -26,6 +26,7 @@ function Node() {
     this.children = [];
     this.root = null;
 
+    this.ComponentClass = null;
     this.component = null;
 
     this.renderedView = null;
@@ -46,6 +47,7 @@ Node.create = function(view) {
 
     component = new Class(view.props, view.children);
     component.__node = node;
+    node.ComponentClass = Class;
     node.component = component;
     node.currentView = view;
 
@@ -103,8 +105,11 @@ NodePrototype.__mount = function(transaction) {
 NodePrototype.__renderRecurse = function(transaction) {
     var _this = this,
         parentId = this.id,
-        renderedView = this.render();
+        renderedView;
 
+    this.__checkPropTypes(this.component.props);
+
+    renderedView = this.render();
     renderedView.children = map(renderedView.children, function(child, index) {
         var node;
 
@@ -181,6 +186,8 @@ NodePrototype.__update = function(
 
     if (component.shouldComponentUpdate(nextProps, nextChildren, nextState)) {
 
+        this.__checkPropTypes(nextProps);
+
         component.props = nextProps;
         component.children = nextChildren;
 
@@ -221,6 +228,25 @@ NodePrototype.__getRefs = function() {
 
     component.refs = emptyObject;
     getRefs(this, component, this.children);
+};
+
+NodePrototype.__checkPropTypes = function(props) {
+    var localHas = has,
+        displayName = this.component.displayName,
+        ComponentClass = this.ComponentClass,
+        componentPropTypes = ComponentClass.propTypes,
+        propName, error;
+
+    if (componentPropTypes) {
+        for (propName in componentPropTypes) {
+            if (localHas(componentPropTypes, propName)) {
+                error = componentPropTypes[propName](props, propName, displayName);
+                if (error !== null) {
+                    console.warn(error);
+                }
+            }
+        }
+    }
 };
 
 function getRefs(owner, ownerComponent, children) {
