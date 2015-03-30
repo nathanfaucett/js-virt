@@ -6,7 +6,8 @@ var isPrimitive = require("is_primitive"),
     isNumber = require("is_number"),
     fastSlice = require("fast_slice"),
     has = require("has"),
-    map = require("map");
+    map = require("map"),
+    owner = require("./owner");
 
 
 var ViewPrototype;
@@ -15,7 +16,8 @@ var ViewPrototype;
 module.exports = View;
 
 
-function View(type, key, ref, props, children) {
+function View(type, key, ref, props, children, owner) {
+    this.__owner = owner;
     this.type = type;
     this.key = key;
     this.ref = ref;
@@ -97,7 +99,7 @@ function construct(type, config, children) {
         }
     }
 
-    return new View(type, key, ref, props, insureValidChildren(children));
+    return new View(type, key, ref, props, insureValidChildren(children), owner.current);
 }
 
 function propsToJSON(props) {

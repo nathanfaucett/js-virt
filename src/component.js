@@ -1,5 +1,7 @@
 var inherits = require("inherits"),
-    extend = require("extend");
+    extend = require("extend"),
+    componentState = require("./utils/component_state"),
+    emptyObject = require("./utils/empty_object");
 
 
 var ComponentPrototype;
@@ -10,11 +12,12 @@ module.exports = Component;
 
 function Component(props, children) {
     this.__node = null;
+    this.__mountState = componentState.UNMOUNTED;
     this.__previousState = null;
     this.props = props;
     this.children = children;
     this.state = null;
-    this.refs = null;
+    this.refs = emptyObject;
 }
 
 ComponentPrototype = Component.prototype;
@@ -39,12 +42,17 @@ ComponentPrototype.setState = function(state) {
     this.__previousState = this.state;
     this.state = extend({}, this.state, state);
 
-    node.root.update(node);
+    if (this.__mountState === componentState.MOUNTED) {
+        node.root.update(node);
+    }
 };
 
 ComponentPrototype.forceUpdate = function() {
     var node = this.__node;
-    node.root.update(node);
+
+    if (this.__mountState === componentState.MOUNTED) {
+        node.root.update(node);
+    }
 };
 
 ComponentPrototype.componentDidMount = function() {};

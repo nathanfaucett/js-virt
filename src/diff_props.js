@@ -1,4 +1,4 @@
-var indexOf = require("index_of"),
+var has = require("has"),
     isObject = require("is_object"),
     getPrototypeOf = require("get_prototype_of"),
     isNullOrUndefined = require("is_null_or_undefined");
@@ -9,7 +9,8 @@ module.exports = diffProps;
 
 function diffProps(id, eventManager, transaction, previous, next) {
     var result = null,
-        eventPropNames = eventManager.propNames,
+        localHas = has,
+        propNameToTopLevel = eventManager.propNameToTopLevel,
         key, previousValue, nextValue, propsDiff;
 
     for (key in previous) {
@@ -19,8 +20,8 @@ function diffProps(id, eventManager, transaction, previous, next) {
             result = result || {};
             result[key] = undefined;
 
-            if (indexOf(eventPropNames, key) !== -1) {
-                eventManager.off(id, key, transaction);
+            if (localHas(propNameToTopLevel, key)) {
+                eventManager.off(id, propNameToTopLevel[key], transaction);
             }
         } else {
             previousValue = previous[key];
@@ -52,8 +53,8 @@ function diffProps(id, eventManager, transaction, previous, next) {
             result = result || {};
             result[key] = nextValue;
 
-            if (indexOf(eventPropNames, key) !== -1) {
-                eventManager.on(id, key, nextValue, transaction);
+            if (localHas(propNameToTopLevel, key)) {
+                eventManager.on(id, propNameToTopLevel[key], transaction);
             }
         }
     }

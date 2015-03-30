@@ -5,33 +5,33 @@ module.exports = EventManager;
 
 
 function EventManager() {
-    this.propNames = [];
+    this.propNameToTopLevel = {};
     this.__events = {};
 }
 
 EventManagerPrototype = EventManager.prototype;
 
-EventManagerPrototype.on = function(id, type, listener, transaction) {
+EventManagerPrototype.on = function(id, topLevelType, listener, transaction) {
     var events = this.__events,
-        event = events[type] || (events[type] = {});
+        event = events[topLevelType] || (events[topLevelType] = {});
 
     event[id] = listener;
-    transaction.event(id, type);
+    transaction.event(id, topLevelType);
 };
 
-EventManagerPrototype.off = function(id, type, transaction) {
+EventManagerPrototype.off = function(id, topLevelType, transaction) {
     var events = this.__events,
-        event = events[type];
+        event = events[topLevelType];
 
     if (event[id] !== undefined) {
         delete event[id];
-        transaction.removeEvent(id, type);
+        transaction.removeEvent(id, topLevelType);
     }
 };
 
-EventManagerPrototype.get = function(id, type) {
+EventManagerPrototype.get = function(id, topLevelType) {
     var events = this.__events,
-        event = events[type];
+        event = events[topLevelType];
 
     if (event !== undefined) {
         return event[id];
@@ -42,12 +42,12 @@ EventManagerPrototype.get = function(id, type) {
 
 EventManagerPrototype.allOff = function(id, transaction) {
     var events = this.__events,
-        event, type;
+        event, topLevelType;
 
-    for (type in events) {
-        if ((event = events[type])[id] !== undefined) {
+    for (topLevelType in events) {
+        if ((event = events[topLevelType])[id] !== undefined) {
             delete event[id];
-            transaction.removeEvent(id, type);
+            transaction.removeEvent(id, topLevelType);
         }
     }
 };

@@ -1,9 +1,14 @@
-var indexOf = require("index_of"),
+var has = require("has"),
     map = require("map"),
+    indexOf = require("index_of"),
+    isString = require("is_string"),
     isFunction = require("is_function"),
+    owner = require("./owner"),
+    componentState = require("./utils/component_state"),
     getComponentClassForType = require("./utils/get_component_class_for_type"),
     View = require("./view"),
     getViewKey = require("./utils/get_view_key"),
+    emptyObject = require("./utils/empty_object"),
     diff;
 
 
@@ -85,9 +90,12 @@ NodePrototype.__mount = function(transaction) {
 
     mountEvents(this.id, renderedView.props, this.root.eventManager, transaction);
 
+    component.__mountState = componentState.MOUNTING;
     component.componentWillMount();
 
+
     transaction.queue.enqueue(function onMount() {
+        component.__mountState = componentState.MOUNTED;
         component.componentDidMount();
     });
 };
@@ -114,6 +122,8 @@ NodePrototype.__renderRecurse = function(transaction) {
     this.renderedView = renderedView;
     this.__mount(transaction);
 
+    this.__getRefs();
+
     return renderedView;
 };
 
@@ -135,7 +145,12 @@ NodePrototype.__unmount = function(transaction) {
 
     this.root.eventManager.allOff(this.id, transaction);
 
+    component.__mountState = componentState.UNMOUNTING;
     component.componentWillUnmount();
+
+    transaction.queue.enqueue(function onUnmount() {
+        component.__mountState = componentState.UNMOUNTED;
+    });
 };
 
 NodePrototype.update = function(nextView, transaction) {
@@ -174,6 +189,8 @@ NodePrototype.__update = function(
         renderedView = this.render();
         diff(this, this.renderedView, renderedView, transaction);
         this.renderedView = renderedView;
+
+        this.__getRefs();
     } else {
         component.props = nextProps;
         component.children = nextChildren;
@@ -188,21 +205,59 @@ NodePrototype.__update = function(
 
 NodePrototype.render = function() {
     var currentView = this.currentView,
-        renderedView = this.component.render();
+        renderedView;
 
+    owner.current = this;
+    renderedView = this.component.render();
     renderedView.key = currentView.key;
     renderedView.ref = currentView.ref;
+    owner.current = null;
 
     return renderedView;
 };
 
+NodePrototype.__getRefs = function() {
+    var component = this.component;
+
+    component.refs = emptyObject;
+    getRefs(this, component, this.children);
+};
+
+function getRefs(owner, ownerComponent, children) {
+    var i = -1,
+        il = children.length - 1,
+        child, currentView;
+
+    while (i++ < il) {
+        child = children[i];
+        currentView = child.currentView;
+
+        if (currentView.__owner === owner) {
+            getRef(owner, ownerComponent, currentView, child.component);
+        }
+
+        getRefs(owner, ownerComponent, child.children);
+    }
+}
+
+function getRef(owner, ownerComponent, currentView, nodeComponent) {
+    var ref = currentView.ref,
+        refs;
+
+    if (isString(ref)) {
+        refs = ownerComponent.refs === emptyObject ? (ownerComponent.refs = {}) : ownerComponent.refs;
+        refs[ref] = nodeComponent;
+    }
+}
+
 function mountEvents(id, props, eventManager, transaction) {
-    var eventPropNames = eventManager.propNames,
+    var propNameToTopLevel = eventManager.propNameToTopLevel,
+        localHas = has,
         key;
 
     for (key in props) {
-        if (indexOf(eventPropNames, key) !== -1) {
-            eventManager.on(id, key, props[key], transaction);
+        if (localHas(propNameToTopLevel, key)) {
+            eventManager.on(id, propNameToTopLevel[key], props[key], transaction);
         }
     }
 }

@@ -1,8 +1,5 @@
-var View = require("../view"),
-    Component = require("../component");
-
-
-var nativeComponents = {};
+var nativeComponents = require("./native_components"),
+    createNativeComponentForType = require("./create_native_component_for_type");
 
 
 module.exports = getComponentClassForType;
@@ -14,19 +11,8 @@ function getComponentClassForType(type) {
     if (Class) {
         return Class;
     } else {
-        return (nativeComponents[type] = createNativeComponentForType(type));
+        Class = createNativeComponentForType(type);
+        nativeComponents[type] = Class;
+        return Class;
     }
-}
-
-function createNativeComponentForType(type) {
-    function NativeComponent(props, children) {
-        Component.call(this, props, children);
-    }
-    Component.extend(NativeComponent);
-
-    NativeComponent.prototype.render = function() {
-        return new View(type, null, null, this.props, this.children);
-    };
-
-    return NativeComponent;
 }
