@@ -3,7 +3,9 @@ var has = require("has"),
     indexOf = require("index_of"),
     isString = require("is_string"),
     isFunction = require("is_function"),
+    extend = require("extend"),
     owner = require("./owner"),
+    context = require("./context"),
     componentState = require("./utils/component_state"),
     getComponentClassForType = require("./utils/get_component_class_for_type"),
     View = require("./view"),
@@ -26,7 +28,6 @@ function Node() {
     this.children = [];
     this.root = null;
 
-    this.ComponentClass = null;
     this.component = null;
 
     this.renderedView = null;
@@ -37,7 +38,7 @@ NodePrototype = Node.prototype;
 
 Node.create = function(view) {
     var node = new Node(),
-        Class, component;
+        Class, component, props, context;
 
     if (isFunction(view.type)) {
         Class = view.type;
@@ -45,11 +46,13 @@ Node.create = function(view) {
         Class = getComponentClassForType(view.type);
     }
 
-    component = new Class(view.props, view.children);
-    component.__node = node;
-    node.ComponentClass = Class;
-    node.component = component;
     node.currentView = view;
+    props = node.__processProps(view.props);
+    context = node.__processContext(view.__context);
+
+    component = new Class(props, view.children, context);
+    component.__node = node;
+    node.component = component;
 
     return node;
 };
@@ -95,7 +98,6 @@ NodePrototype.__mount = function(transaction) {
     component.__mountState = componentState.MOUNTING;
     component.componentWillMount();
 
-
     transaction.queue.enqueue(function onMount() {
         component.__mountState = componentState.MOUNTED;
         component.componentDidMount();
@@ -106,8 +108,6 @@ NodePrototype.__renderRecurse = function(transaction) {
     var _this = this,
         parentId = this.id,
         renderedView;
-
-    this.__checkPropTypes(this.component.props);
 
     renderedView = this.render();
     renderedView.children = map(renderedView.children, function(child, index) {
@@ -180,16 +180,19 @@ NodePrototype.__update = function(
     transaction
 ) {
     var component = this.component,
-        renderedView;
+        previousContext = component.context,
+        nextContext, renderedView;
 
-    component.componentWillReceiveProps(nextProps, nextChildren);
+    nextProps = this.__processProps(nextProps);
+    nextContext = this.__processContext(currentView.__context);
 
-    if (component.shouldComponentUpdate(nextProps, nextChildren, nextState)) {
+    component.componentWillReceiveProps(nextProps, nextChildren, nextContext);
 
-        this.__checkPropTypes(nextProps);
+    if (component.shouldComponentUpdate(nextProps, nextChildren, nextState, nextContext)) {
 
         component.props = nextProps;
         component.children = nextChildren;
+        component.context = nextContext;
 
         component.componentWillUpdate();
 
@@ -201,23 +204,29 @@ NodePrototype.__update = function(
     } else {
         component.props = nextProps;
         component.children = nextChildren;
+        component.context = nextContext;
     }
 
     this.currentView = currentView;
 
     transaction.queue.enqueue(function onUpdate() {
-        component.componentDidUpdate(previousProps, previousChildren, previousState);
+        component.componentDidUpdate(previousProps, previousChildren, previousState, previousContext);
     });
 };
 
 NodePrototype.render = function() {
     var currentView = this.currentView,
+        previousContext = context.current,
         renderedView;
 
+    context.current = this.__processChildContext(currentView.__context);
     owner.current = this;
+
     renderedView = this.component.render();
     renderedView.key = currentView.key;
     renderedView.ref = currentView.ref;
+
+    context.current = previousContext;
     owner.current = null;
 
     return renderedView;
@@ -230,22 +239,102 @@ NodePrototype.__getRefs = function() {
     getRefs(this, component, this.children);
 };
 
-NodePrototype.__checkPropTypes = function(props) {
+NodePrototype.__checkTypes = function(propTypes, props) {
     var localHas = has,
         displayName = this.component.displayName,
-        ComponentClass = this.ComponentClass,
-        componentPropTypes = ComponentClass.propTypes,
         propName, error;
 
-    if (componentPropTypes) {
-        for (propName in componentPropTypes) {
-            if (localHas(componentPropTypes, propName)) {
-                error = componentPropTypes[propName](props, propName, displayName);
+    if (propTypes) {
+        for (propName in propTypes) {
+            if (localHas(propTypes, propName)) {
+                error = propTypes[propName](props, propName, displayName);
                 if (error !== null) {
                     console.warn(error);
                 }
             }
         }
+    }
+};
+
+NodePrototype.__processProps = function(props) {
+    var propTypes;
+
+    if (process.env.NODE_ENV === "development") {
+        propTypes = this.currentView.type.propTypes;
+
+        if (propTypes) {
+            this.__checkTypes(propTypes, props);
+        }
+    }
+
+    return props;
+};
+
+NodePrototype.__maskContext = function(context) {
+    var maskedContext = null,
+        contextTypes, contextName, localHas;
+
+    if (isString(this.currentView.type)) {
+        return emptyObject;
+    } else {
+        contextTypes = this.currentView.type.contextTypes;
+
+        if (contextTypes) {
+            maskedContext = {};
+            localHas = has;
+
+            for (contextName in contextTypes) {
+                if (localHas(contextTypes, contextName)) {
+                    maskedContext[contextName] = context[contextName];
+                }
+            }
+        }
+
+        return maskedContext;
+    }
+};
+
+NodePrototype.__processContext = function(context) {
+    var maskedContext = this.__maskContext(context),
+        contextTypes;
+
+    if (process.env.NODE_ENV === "development") {
+        contextTypes = this.currentView.type.contextTypes;
+
+        if (contextTypes) {
+            this.__checkTypes(contextTypes, maskedContext);
+        }
+    }
+
+    return maskedContext;
+};
+
+NodePrototype.__processChildContext = function(currentContext) {
+    var component = this.component,
+        childContext = component.getChildContext(),
+        childContextTypes, localHas, contextName, displayName;
+
+    if (childContext) {
+        childContextTypes = this.currentView.type.childContextTypes;
+
+        if (process.env.NODE_ENV === "development") {
+            this.__checkTypes(childContextTypes, childContext);
+        }
+
+        localHas = has;
+        displayName = component.displayName;
+
+        for (contextName in childContext) {
+            if (!localHas(childContextTypes, contextName)) {
+                console.warn(new Error(
+                    displayName + " getChildContext(): key " + contextName + " is not defined in childContextTypes"
+                ));
+            }
+        }
+
+        return extend({}, currentContext, childContext);
+    } else {
+        return currentContext;
     }
 };
 

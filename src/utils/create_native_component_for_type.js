@@ -12,7 +12,7 @@ function createNativeComponentForType(type) {
     Component.extend(NativeComponent);
 
     NativeComponent.prototype.render = function() {
-        return new View(type, null, null, this.props, this.children, null);
+        return new View(type, null, null, this.props, this.children, null, null);
     };
 
     return NativeComponent;
