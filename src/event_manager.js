@@ -29,17 +29,6 @@ EventManagerPrototype.off = function(id, topLevelType, transaction) {
     }
 };
 
-EventManagerPrototype.get = function(id, topLevelType) {
-    var events = this.__events,
-        event = events[topLevelType];
-
-    if (event !== undefined) {
-        return event[id];
-    } else {
-        return null;
-    }
-};
-
 EventManagerPrototype.allOff = function(id, transaction) {
     var events = this.__events,
         event, topLevelType;

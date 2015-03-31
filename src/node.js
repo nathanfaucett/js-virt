@@ -68,20 +68,35 @@ NodePrototype.appendNode = function(node) {
 NodePrototype.removeNode = function(node, transaction) {
     var children = this.children;
 
-    node.removeChildren(transaction);
+    this.__removeNode(node, transaction);
+    children.splice(indexOf(children, node), 1);
+};
+
+NodePrototype.__removeNode = function(node, transaction) {
+    node.__removeChildren(transaction);
     node.__unmount(transaction);
     node.parent = null;
-    children.splice(indexOf(children, node), 1);
     this.root.removeNode(node);
 };
 
-NodePrototype.removeChildren = function(transaction) {
+NodePrototype.__removeChildren = function(transaction) {
     var children = this.children,
         i = -1,
         il = children.length - 1;
 
     while (i++ < il) {
-        this.removeNode(children[i], transaction);
+        this.__removeNode(children[i], transaction);
+    }
+
+    children.length = 0;
+};
+
+NodePrototype.__detach = function(transaction) {
+    if (this.parent !== null) {
+        this.parent.removeNode(this, transaction);
+    } else {
+        this.__removeChildren(this, transaction);
+        this.root.removeNode(this);
     }
 };
 
@@ -134,14 +149,7 @@ NodePrototype.__renderRecurse = function(transaction) {
 
 NodePrototype.unmount = function(transaction) {
     var parentId = this.parent ? this.parent.id : this.id;
-
-    if (this.parent !== null) {
-        this.parent.removeNode(this, transaction);
-    } else {
-        this.removeChildren(transaction);
-        this.root.removeNode(this);
-    }
-
+    this.__detach(transaction);
     transaction.remove(parentId, this.id, 0);
 };
 

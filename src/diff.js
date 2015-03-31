@@ -80,18 +80,23 @@ function diffChild(parentNode, previousChild, nextChild, transaction, parentId, 
                 node = parentNode.root.childHash[id];
 
                 if (node) {
-                    if (shouldUpdate(previousChild, nextChild)) {
+                    if (shouldUpdate(node.currentView, nextChild)) {
                         node.update(nextChild, transaction);
                         return;
                     } else {
-                        node.unmount(transaction);
-                    }
-                }
+                        node.__detach(transaction);
 
-                node = Node.create(nextChild);
-                id = node.id = parentId + "." + getViewKey(nextChild, index);
-                parentNode.appendNode(node);
-                transaction.insert(parentId, id, index, node.__renderRecurse(transaction));
+                        node = Node.create(nextChild);
+                        id = node.id = parentId + "." + getViewKey(nextChild, index);
+                        parentNode.appendNode(node);
+                        transaction.replace(parentId, id, index, node.__renderRecurse(transaction));
+                    }
+                } else {
+                    node = Node.create(nextChild);
+                    id = node.id = parentId + "." + getViewKey(nextChild, index);
+                    parentNode.appendNode(node);
+                    transaction.insert(parentId, id, index, node.__renderRecurse(transaction));
+                }
             }
         }
     }
