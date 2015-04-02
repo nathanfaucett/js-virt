@@ -43,7 +43,7 @@ RootPrototype.removeNode = function(node) {
         childHash = this.childHash;
 
     if (childHash[id] !== undefined) {
-        node.parent = null;
+        node.root = null;
         delete childHash[id];
     } else {
         throw new Error("Root removeNode(node) trying to remove node that does not exists with id " + id);
@@ -78,19 +78,24 @@ RootPrototype.__enqueueTransaction = function(transaction) {
     transactions[transactions.length] = transaction;
 };
 
-RootPrototype.update = function(node) {
-    var transaction = Transaction.create(),
-        component = node.component,
-        renderedView = node.renderedView,
-        currentView = node.currentView;
+RootPrototype.unmount = function() {
+    var node = this.childHash[this.id],
+        transaction;
 
-    node.__update(
-        component.props, renderedView.props,
-        component.children, renderedView.children,
-        component.__previousState, component.state,
-        currentView,
-        transaction
-    );
+    if (node) {
+        transaction = Transaction.create();
+
+        node.unmount(transaction);
+
+        this.__enqueueTransaction(transaction);
+        this.__processTransaction();
+    }
+};
+
+RootPrototype.update = function(node) {
+    var transaction = Transaction.create();
+
+    node.update(node.currentView, transaction);
 
     this.__enqueueTransaction(transaction);
     this.__processTransaction();
@@ -104,7 +109,7 @@ RootPrototype.render = function(nextView, id) {
     node = this.childHash[id];
 
     if (node) {
-        if (shouldUpdate(node.renderedView, nextView)) {
+        if (shouldUpdate(node.currentView, nextView)) {
 
             node.update(nextView, transaction);
             this.__enqueueTransaction(transaction);
@@ -116,8 +121,7 @@ RootPrototype.render = function(nextView, id) {
         }
     }
 
-    node = Node.create(nextView);
-    node.id = id;
+    node = new Node(id, id, nextView);
     this.appendNode(node);
     node.mount(transaction);
 

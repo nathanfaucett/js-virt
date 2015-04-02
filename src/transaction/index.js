@@ -2,6 +2,7 @@ var createPool = require("create_pool"),
     Queue = require("queue"),
     consts = require("./consts"),
     InsertPatch = require("./insert_patch"),
+    MountPatch = require("./mount_patch"),
     OrderPatch = require("./order_patch"),
     PropsPatch = require("./props_patch"),
     RemovePatch = require("./remove_patch"),
@@ -64,6 +65,10 @@ Transaction.prototype.destructor = function() {
     clearHash(this.events);
     clearHash(this.eventsRemove);
     return this;
+};
+
+Transaction.prototype.mount = function(id, next) {
+    this.append(MountPatch.create(id, next));
 };
 
 Transaction.prototype.insert = function(id, childId, index, next) {

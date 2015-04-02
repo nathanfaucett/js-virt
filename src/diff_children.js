@@ -9,25 +9,15 @@ var getViewKey = require("./utils/get_view_key"),
 var isPrimativeView = View.isPrimativeView;
 
 
-module.exports = diff;
+module.exports = diffChildren;
 
 
 Node = require("./node");
 
 
-function diff(node, previous, next, transaction) {
-    var id = node.id,
-        propsDiff = diffProps(id, node.root.eventManager, transaction, previous.props, next.props);
-
-    if (propsDiff !== null) {
-        transaction.props(id, previous.props, propsDiff);
-    }
-
-    return diffChildren(node, previous, next, transaction);
-}
-
 function diffChildren(node, previous, next, transaction) {
-    var previousChildren = previous.children,
+    var root = node.root,
+        previousChildren = previous.children,
         nextChildren = reorder(previousChildren, next.children),
         previousLength = previousChildren.length,
         nextLength = nextChildren.length,
@@ -36,7 +26,7 @@ function diffChildren(node, previous, next, transaction) {
         il = (previousLength > nextLength ? previousLength : nextLength) - 1;
 
     while (i++ < il) {
-        diffChild(node, previousChildren[i], nextChildren[i], transaction, parentId, i);
+        diffChild(root, node, previousChildren[i], nextChildren[i], transaction, parentId, i);
     }
 
     if (nextChildren.moves) {
@@ -44,7 +34,7 @@ function diffChildren(node, previous, next, transaction) {
     }
 }
 
-function diffChild(parentNode, previousChild, nextChild, transaction, parentId, index) {
+function diffChild(root, parentNode, previousChild, nextChild, transaction, parentId, index) {
     var node, id;
 
     if (previousChild !== nextChild) {
@@ -52,10 +42,10 @@ function diffChild(parentNode, previousChild, nextChild, transaction, parentId, 
             if (isPrimativeView(nextChild)) {
                 transaction.insert(parentId, null, index, nextChild);
             } else {
-                node = Node.create(nextChild);
-                id = node.id = parentId + "." + getViewKey(nextChild, index);
-                parentNode.appendNode(node);
-                transaction.insert(parentId, id, index, node.__renderRecurse(transaction));
+                id = parentId + "." + getViewKey(nextChild, index);
+                node = new Node(parentId, id, nextChild);
+                root.appendNode(node);
+                transaction.insert(parentId, id, index, node.__mount(transaction));
             }
         } else if (isPrimativeView(previousChild)) {
             if (isNullOrUndefined(nextChild)) {
@@ -63,39 +53,39 @@ function diffChild(parentNode, previousChild, nextChild, transaction, parentId, 
             } else if (isPrimativeView(nextChild)) {
                 transaction.text(parentId, index, nextChild);
             } else {
-                node = Node.create(nextChild);
-                id = node.id = parentId + "." + getViewKey(nextChild, index);
-                parentNode.appendNode(node);
-                transaction.replace(parentId, id, index, node.__renderRecurse(transaction));
+                id = parentId + "." + getViewKey(nextChild, index);
+                node = new Node(parentId, id, nextChild);
+                root.appendNode(node);
+                transaction.replace(parentId, id, index, node.__mount(transaction));
             }
         } else {
             if (isNullOrUndefined(nextChild)) {
                 id = parentId + "." + getViewKey(previousChild, index);
-                node = parentNode.root.childHash[id];
+                node = root.childHash[id];
                 node.unmount(transaction);
             } else if (isPrimativeView(nextChild)) {
                 transaction.replace(parentId, null, index, nextChild);
             } else {
                 id = parentId + "." + getViewKey(previousChild, index);
-                node = parentNode.root.childHash[id];
+                node = root.childHash[id];
 
                 if (node) {
                     if (shouldUpdate(node.currentView, nextChild)) {
                         node.update(nextChild, transaction);
                         return;
                     } else {
-                        node.__detach(transaction);
+                        node.__unmount(transaction);
 
-                        node = Node.create(nextChild);
-                        id = node.id = parentId + "." + getViewKey(nextChild, index);
-                        parentNode.appendNode(node);
-                        transaction.replace(parentId, id, index, node.__renderRecurse(transaction));
+                        id = parentId + "." + getViewKey(nextChild, index);
+                        node = new Node(parentId, id, nextChild);
+                        root.appendNode(node);
+                        transaction.replace(parentId, id, index, node.__mount(transaction));
                     }
                 } else {
-                    node = Node.create(nextChild);
-                    id = node.id = parentId + "." + getViewKey(nextChild, index);
-                    parentNode.appendNode(node);
-                    transaction.insert(parentId, id, index, node.__renderRecurse(transaction));
+                    id = parentId + "." + getViewKey(nextChild, index);
+                    node = new Node(parentId, id, nextChild);
+                    root.appendNode(node);
+                    transaction.insert(parentId, id, index, node.__mount(transaction));
                 }
             }
         }

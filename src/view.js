@@ -31,6 +31,21 @@ ViewPrototype = View.prototype;
 
 ViewPrototype.__View__ = true;
 
+ViewPrototype.copy = function(view) {
+    this.__owner = view.__owner;
+    this.__context = view.__context;
+    this.type = view.type;
+    this.key = view.key;
+    this.ref = view.ref;
+    this.props = view.props;
+    this.children = view.children;
+    return this;
+};
+
+ViewPrototype.clone = function() {
+    return new View(this.type, this.key, this.ref, this.props, this.children, this.__owner, this.__context);
+};
+
 ViewPrototype.toJSON = function() {
     return toJSON(this);
 };

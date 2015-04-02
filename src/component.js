@@ -14,6 +14,7 @@ function Component(props, children, context) {
     this.__node = null;
     this.__mountState = componentState.UNMOUNTED;
     this.__previousState = null;
+    this.__nextState = null;
     this.props = props;
     this.children = children;
     this.context = context;
@@ -39,7 +40,7 @@ ComponentPrototype.setState = function(state) {
     var node = this.__node;
 
     this.__previousState = this.state;
-    this.state = extend({}, this.state, state);
+    this.__nextState = extend({}, this.state, state);
 
     if (this.__mountState === componentState.MOUNTED) {
         node.root.update(node);
@@ -52,6 +53,10 @@ ComponentPrototype.forceUpdate = function() {
     if (this.__mountState === componentState.MOUNTED) {
         node.root.update(node);
     }
+};
+
+ComponentPrototype.isMounted = function() {
+    return this.__mountState === componentState.MOUNTED;
 };
 
 ComponentPrototype.getChildContext = function() {};
