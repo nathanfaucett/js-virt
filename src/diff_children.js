@@ -1,5 +1,6 @@
-var getChildKey = require("./utils/get_child_key"),
-    isNullOrUndefined = require("is_null_or_undefined"),
+var isNullOrUndefined = require("is_null_or_undefined"),
+    getChildKey = require("./utils/get_child_key"),
+    shouldUpdate = require("./utils/should_update"),
     View = require("./view"),
     Node;
 
@@ -68,7 +69,16 @@ function diffChild(root, parentNode, previousChild, nextChild, parentId, index, 
                 node = root.childHash[id];
 
                 if (node) {
-                    node.update(nextChild, transaction);
+                    if (shouldUpdate(previousChild, nextChild)) {
+                        node.update(nextChild, transaction);
+                    } else {
+                        node.__unmount(transaction);
+
+                        id = getChildKey(parentId, nextChild, index);
+                        node = new Node(parentId, id, nextChild);
+                        root.appendNode(node);
+                        transaction.replace(parentId, id, index, node.__mount(transaction));
+                    }
                 } else {
                     id = getChildKey(parentId, nextChild, index);
                     node = new Node(parentId, id, nextChild);

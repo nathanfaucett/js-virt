@@ -24,6 +24,7 @@ module.exports = Node;
 
 function Node(parentId, id, currentView) {
 
+    this.parent = null;
     this.parentId = parentId;
     this.id = id;
 
