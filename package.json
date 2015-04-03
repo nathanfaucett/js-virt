@@ -28,7 +28,6 @@
     "fast_slice": "git://github.com/nathanfaucett/fast_slice",
     "get_prototype_of": "git://github.com/nathanfaucett/get_prototype_of",
     "has": "git://github.com/nathanfaucett/has",
-    "index_of": "git://github.com/nathanfaucett/index_of",
     "inherits": "git://github.com/nathanfaucett/inherits",
     "is_array": "git://github.com/nathanfaucett/is_array",
     "is_function": "git://github.com/nathanfaucett/is_function",

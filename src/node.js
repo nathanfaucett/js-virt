@@ -1,7 +1,5 @@
 var has = require("has"),
     map = require("map"),
-    forEach = require("for_each"),
-    indexOf = require("index_of"),
     isString = require("is_string"),
     isFunction = require("is_function"),
     extend = require("extend"),
@@ -11,7 +9,7 @@ var has = require("has"),
     componentState = require("./utils/component_state"),
     getComponentClassForType = require("./utils/get_component_class_for_type"),
     View = require("./view"),
-    getViewKey = require("./utils/get_view_key"),
+    getChildKey = require("./utils/get_child_key"),
     emptyObject = require("./utils/empty_object"),
     diffProps = require("./diff_props"),
     diffChildren;
@@ -38,7 +36,6 @@ function Node(parentId, id, currentView) {
     this.isBottomLevel = true;
     this.isTopLevel = false;
 
-    this.renderedView = null;
     this.renderedNode = null;
     this.renderedChildren = null;
 
@@ -82,7 +79,7 @@ NodePrototype.__mount = function(transaction) {
     this.context = context.current;
     this.mountComponent();
 
-    renderedView = this.renderedView = this.renderView();
+    renderedView = this.renderView();
 
     if (this.isTopLevel !== true) {
         renderedNode = this.renderedNode = new Node(this.parentId, this.id, renderedView);
@@ -91,7 +88,7 @@ NodePrototype.__mount = function(transaction) {
         renderedView = renderedNode.__mount(transaction);
     } else {
         mountEvents(this.id, renderedView.props, this.root.eventManager, transaction);
-        renderedView.children = this.__mountChildren(transaction);
+        this.__mountChildren(renderedView, transaction);
     }
 
     component = this.component;
@@ -108,20 +105,20 @@ NodePrototype.__mount = function(transaction) {
     return renderedView;
 };
 
-NodePrototype.__mountChildren = function(transaction) {
+NodePrototype.__mountChildren = function(renderedView, transaction) {
     var parentId = this.id,
         root = this.root,
         renderedChildren = [];
 
     this.renderedChildren = renderedChildren;
 
-    return map(this.renderedView.children, function(child, index) {
+    renderedView.children = map(renderedView.children, function(child, index) {
         var node, id;
 
         if (isPrimativeView(child)) {
             return child;
         } else {
-            id = parentId + "." + getViewKey(child, index);
+            id = getChildKey(parentId, child, index);
             node = new Node(parentId, id, child);
             root.appendNode(node);
             renderedChildren[renderedChildren.length] = node;
@@ -157,13 +154,7 @@ NodePrototype.__unmount = function(transaction) {
     }
 
     this.context = null;
-
     this.component = null;
-
-    this.renderedView = null;
-    this.renderedNode = null;
-    this.renderedChildren = null;
-
     this.currentView = null;
 
     transaction.queue.enqueue(function onUnmount() {
@@ -209,6 +200,8 @@ NodePrototype.updateComponent = function(
 
         nextState;
 
+    component.__mountState = componentState.UPDATING;
+
     if (prevParentView !== nextParentView) {
         nextProps = this.__processProps(nextParentView.props);
         nextChildren = nextParentView.children;
@@ -231,6 +224,8 @@ NodePrototype.updateComponent = function(
         component.children = nextChildren;
         component.state = nextState;
         component.context = nextContext;
+
+        component.__mountState = componentState.MOUNTED;
     }
 };
 
@@ -241,10 +236,11 @@ NodePrototype.__updateComponent = function(
 
         prevProps = component.props,
         prevChildren = component.children,
-        prevState = component.state,
-        prevContext = component.context;
+        prevState = component.__previousState,
+        prevContext = component.context,
 
-    component.__mountState = componentState.UPDATING;
+        prevParentView;
+
     component.componentWillUpdate(nextProps, nextChildren, nextState, nextContext);
 
     component.props = nextProps;
@@ -252,13 +248,15 @@ NodePrototype.__updateComponent = function(
     component.state = nextState;
     component.context = nextContext;
 
+    this.context = unmaskedContext;
+
     if (this.isTopLevel !== true) {
         this.currentView = nextParentView;
-        this.context = unmaskedContext;
         this.__updateRenderedNode(unmaskedContext, transaction);
     } else {
-        this.__updateRenderedView(unmaskedContext, transaction);
+        prevParentView = this.currentView;
         this.currentView = nextParentView;
+        this.__updateRenderedView(prevParentView, unmaskedContext, transaction);
     }
 
     transaction.queue.enqueue(function onUpdate() {
@@ -291,12 +289,9 @@ NodePrototype.__updateRenderedNode = function(context, transaction) {
 
 diffChildren = require("./diff_children");
 
-NodePrototype.__updateRenderedView = function(context, transaction) {
+NodePrototype.__updateRenderedView = function(prevRenderedView, context, transaction) {
     var id = this.id,
-
-        prevRenderedView = this.currentView,
         nextRenderedView = this.renderView(),
-
         propsDiff = diffProps(id, this.root.eventManager, transaction, prevRenderedView.props, nextRenderedView.props);
 
     if (propsDiff !== null) {
@@ -430,7 +425,7 @@ NodePrototype.__attachRefs = function() {
         ref = view.ref;
 
     if (isString(ref)) {
-        attachRef(this.component, view.ref, view.__owner);
+        attachRef(this.component, ref, view.__owner);
     }
 };
 
@@ -439,7 +434,7 @@ NodePrototype.__detachRefs = function() {
         ref = view.ref;
 
     if (isString(ref)) {
-        detachRef(view.ref, view.__owner);
+        detachRef(ref, view.__owner);
     }
 };
 

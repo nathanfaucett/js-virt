@@ -13,7 +13,6 @@ module.exports = Component;
 function Component(props, children, context) {
     this.__node = null;
     this.__mountState = componentState.UNMOUNTED;
-    this.__previousState = null;
     this.__nextState = null;
     this.props = props;
     this.children = children;
@@ -39,7 +38,6 @@ ComponentPrototype.render = function() {
 ComponentPrototype.setState = function(state) {
     var node = this.__node;
 
-    this.__previousState = this.state;
     this.__nextState = extend({}, this.state, state);
 
     if (this.__mountState === componentState.MOUNTED) {

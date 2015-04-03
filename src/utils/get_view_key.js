@@ -13,14 +13,10 @@ function getViewKey(view, index) {
     if (isNullOrUndefined(key)) {
         return index.toString(36);
     } else {
-        return wrapKey(escapeKey(key));
+        return "$" + escapeKey(key);
     }
 }
 
 function escapeKey(key) {
     return (key + "").replace(reEscape, "$");
-}
-
-function wrapKey(key) {
-    return "$" + key;
 }
