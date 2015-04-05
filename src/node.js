@@ -59,7 +59,6 @@ NodePrototype.removeNode = function(node) {
     var renderedChildren = this.renderedChildren,
         index;
 
-    this.root.removeNode(node);
     node.parent = null;
 
     index = indexOf(renderedChildren, node);
