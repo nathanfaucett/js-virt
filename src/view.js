@@ -3,6 +3,7 @@ var isPrimitive = require("is_primitive"),
     isArray = require("is_array"),
     isString = require("is_string"),
     isObjectLike = require("is_object_like"),
+    isNullOrUndefined = require("is_null_or_undefined"),
     isNumber = require("is_number"),
     fastSlice = require("fast_slice"),
     has = require("has"),
@@ -101,17 +102,27 @@ function construct(type, config, children) {
     var props = {},
         key = null,
         ref = null,
-        configKey;
+        propName, defaultProps;
 
     if (config) {
         key = config.key != null ? config.key : null;
         ref = config.ref != null ? config.ref : null;
 
-        for (configKey in config) {
-            if (has(config, configKey)) {
-                if (!(configKey === "key" || configKey === "ref")) {
-                    props[configKey] = config[configKey];
+        for (propName in config) {
+            if (has(config, propName)) {
+                if (!(propName === "key" || propName === "ref")) {
+                    props[propName] = config[propName];
                 }
+            }
+        }
+    }
+
+    if (type && type.defaultProps) {
+        defaultProps = type.defaultProps;
+
+        for (propName in defaultProps) {
+            if (isNullOrUndefined(props[propName])) {
+                props[propName] = defaultProps[propName];
             }
         }
     }
