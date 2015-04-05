@@ -43,7 +43,7 @@ function diffChild(root, parentNode, previousChild, nextChild, parentId, index, 
             } else {
                 id = getChildKey(parentId, nextChild, index);
                 node = new Node(parentId, id, nextChild);
-                root.appendNode(node);
+                parentNode.appendNode(node);
                 transaction.insert(parentId, id, index, node.__mount(transaction));
             }
         } else if (isPrimativeView(previousChild)) {
@@ -54,7 +54,7 @@ function diffChild(root, parentNode, previousChild, nextChild, parentId, index, 
             } else {
                 id = getChildKey(parentId, nextChild, index);
                 node = new Node(parentId, id, nextChild);
-                root.appendNode(node);
+                parentNode.appendNode(node);
                 transaction.replace(parentId, id, index, node.__mount(transaction));
             }
         } else {
@@ -76,18 +76,20 @@ function diffChild(root, parentNode, previousChild, nextChild, parentId, index, 
 
                         id = getChildKey(parentId, nextChild, index);
                         node = new Node(parentId, id, nextChild);
-                        root.appendNode(node);
+                        parentNode.appendNode(node);
                         transaction.replace(parentId, id, index, node.__mount(transaction));
                     }
                 } else {
                     id = getChildKey(parentId, nextChild, index);
                     node = new Node(parentId, id, nextChild);
-                    root.appendNode(node);
+                    parentNode.appendNode(node);
                     transaction.insert(parentId, id, index, node.__mount(transaction));
                 }
             }
         }
     }
+
+    console.log(parentNode.renderedChildren);
 }
 
 function reorder(previousChildren, nextChildren) {

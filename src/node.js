@@ -1,5 +1,6 @@
 var has = require("has"),
     map = require("map"),
+    indexOf = require("index_of"),
     isString = require("is_string"),
     isFunction = require("is_function"),
     extend = require("extend"),
@@ -44,6 +45,28 @@ function Node(parentId, id, currentView) {
 }
 
 NodePrototype = Node.prototype;
+
+NodePrototype.appendNode = function(node) {
+    var renderedChildren = this.renderedChildren;
+
+    this.root.appendNode(node);
+    node.parent = this;
+
+    renderedChildren[renderedChildren.length] = node;
+};
+
+NodePrototype.removeNode = function(node) {
+    var renderedChildren = this.renderedChildren,
+        index;
+
+    this.root.removeNode(node);
+    node.parent = null;
+
+    index = indexOf(renderedChildren, node);
+    if (index !== -1) {
+        renderedChildren.splice(index, 1);
+    }
+};
 
 NodePrototype.mountComponent = function() {
     var currentView = this.currentView,
@@ -107,8 +130,8 @@ NodePrototype.__mount = function(transaction) {
 };
 
 NodePrototype.__mountChildren = function(renderedView, transaction) {
-    var parentId = this.id,
-        root = this.root,
+    var _this = this,
+        parentId = this.id,
         renderedChildren = [];
 
     this.renderedChildren = renderedChildren;
@@ -121,8 +144,7 @@ NodePrototype.__mountChildren = function(renderedView, transaction) {
         } else {
             id = getChildKey(parentId, child, index);
             node = new Node(parentId, id, child);
-            root.appendNode(node);
-            renderedChildren[renderedChildren.length] = node;
+            _this.appendNode(node);
             return node.__mount(transaction);
         }
     });
@@ -151,7 +173,11 @@ NodePrototype.__unmount = function(transaction) {
     this.__detachRefs();
 
     if (this.isBottomLevel !== false) {
-        this.root.removeNode(this);
+        if (this.parent !== null) {
+            this.parent.removeNode(this);
+        } else {
+            this.root.removeNode(this);
+        }
     }
 
     this.context = null;
