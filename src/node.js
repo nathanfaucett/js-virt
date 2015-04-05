@@ -170,15 +170,11 @@ NodePrototype.__unmount = function(transaction) {
     component.__mountState = componentState.UNMOUNTING;
     component.componentWillUnmount();
 
-    this.__detachRefs();
-
     if (this.isBottomLevel !== false) {
-        if (this.parent !== null) {
-            this.parent.removeNode(this);
-        } else {
-            this.root.removeNode(this);
-        }
+        this.root.removeNode(this);
     }
+
+    this.__detachRefs();
 
     this.context = null;
     this.component = null;

@@ -88,8 +88,6 @@ function diffChild(root, parentNode, previousChild, nextChild, parentId, index, 
             }
         }
     }
-
-    console.log(parentNode.renderedChildren);
 }
 
 function reorder(previousChildren, nextChildren) {
