@@ -61,6 +61,18 @@ ComponentPrototype.getId = function() {
     return this.__node.id;
 };
 
+ComponentPrototype.emitMessage = function(name, data, callback) {
+    this.__node.root.adaptor.messenger.emit(name, data, callback);
+};
+
+ComponentPrototype.onMessage = function(name, callback) {
+    this.__node.root.adaptor.messenger.on(name, callback);
+};
+
+ComponentPrototype.offMessage = function(name, callback) {
+    this.__node.root.adaptor.messenger.off(name, callback);
+};
+
 ComponentPrototype.getChildContext = function() {};
 
 ComponentPrototype.componentDidMount = function() {};
