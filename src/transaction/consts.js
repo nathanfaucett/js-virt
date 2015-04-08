@@ -7,6 +7,7 @@ module.exports = keyMirror([
     "PROPS",
     "ORDER",
     "INSERT",
+    "REMOVE",
     "MOUNT",
-    "REMOVE"
+    "UNMOUNT"
 ]);

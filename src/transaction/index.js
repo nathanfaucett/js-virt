@@ -3,6 +3,7 @@ var createPool = require("create_pool"),
     consts = require("./consts"),
     InsertPatch = require("./insert_patch"),
     MountPatch = require("./mount_patch"),
+    UnmountPatch = require("./unmount_patch"),
     OrderPatch = require("./order_patch"),
     PropsPatch = require("./props_patch"),
     RemovePatch = require("./remove_patch"),
@@ -69,6 +70,10 @@ Transaction.prototype.destructor = function() {
 
 Transaction.prototype.mount = function(id, next) {
     this.append(MountPatch.create(id, next));
+};
+
+Transaction.prototype.unmount = function(id) {
+    this.append(UnmountPatch.create(id));
 };
 
 Transaction.prototype.insert = function(id, childId, index, next) {

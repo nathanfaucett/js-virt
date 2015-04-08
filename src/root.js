@@ -85,7 +85,8 @@ RootPrototype.unmount = function() {
     if (node) {
         transaction = Transaction.create();
 
-        node.unmount(transaction);
+        transaction.unmount(this.id);
+        node.__unmount(transaction);
 
         this.__enqueueTransaction(transaction);
         this.__processTransaction();
@@ -117,11 +118,16 @@ RootPrototype.render = function(nextView, id) {
 
             return;
         } else {
-            node.unmount(transaction);
+            if (this.id === id) {
+                node.__unmount(transaction);
+                transaction.unmount(id);
+            } else {
+                node.unmount(transaction);
+            }
         }
     }
 
-    node = new Node(id, id, nextView);
+    node = new Node(this.id, id, nextView);
     this.appendNode(node);
     node.mount(transaction);
 
