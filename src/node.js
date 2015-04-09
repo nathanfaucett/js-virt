@@ -78,18 +78,21 @@ NodePrototype.mountComponent = function() {
         this.isTopLevel = true;
     }
 
-    props = this.__processProps(currentView.props);
+    props = currentView.props;
     children = currentView.children;
-    context = this.__processContext(currentView.__context);
+    context = currentView.__context;
 
     component = new ComponentClass(props, children, context);
+
+    this.component = component;
+
+    props = this.__processProps(props);
+    context = this.__processContext(context);
 
     component.__node = this;
     component.props = props;
     component.children = children;
     component.context = context;
-
-    this.component = component;
 };
 
 NodePrototype.mount = function(transaction) {
