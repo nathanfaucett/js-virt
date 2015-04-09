@@ -359,7 +359,7 @@ NodePrototype.__checkTypes = function(propTypes, props) {
 NodePrototype.__processProps = function(props) {
     var propTypes;
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         propTypes = this.currentView.type.propTypes;
 
         if (propTypes) {
@@ -398,7 +398,7 @@ NodePrototype.__processContext = function(context) {
     var maskedContext = this.__maskContext(context),
         contextTypes;
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV !== "production") {
         contextTypes = this.currentView.type.contextTypes;
 
         if (contextTypes) {
@@ -417,7 +417,7 @@ NodePrototype.__processChildContext = function(currentContext) {
     if (childContext) {
         childContextTypes = this.currentView.type.childContextTypes;
 
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV !== "production") {
             if (childContextTypes) {
                 this.__checkTypes(childContextTypes, childContext);
             }
