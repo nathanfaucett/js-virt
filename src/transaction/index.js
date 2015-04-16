@@ -92,8 +92,8 @@ Transaction.prototype.replace = function(id, childId, index, next) {
     this.append(ReplacePatch.create(id, childId, index, next));
 };
 
-Transaction.prototype.text = function(id, index, next) {
-    this.append(TextPatch.create(id, index, next));
+Transaction.prototype.text = function(id, index, next, props) {
+    this.append(TextPatch.create(id, index, next, props));
 };
 
 Transaction.prototype.remove = function(id, childId, index) {

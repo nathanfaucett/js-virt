@@ -1,5 +1,9 @@
 var createPool = require("create_pool"),
+    propsToJSON = require("../utils/props_to_json"),
     consts = require("./consts");
+
+
+var TextPatchPrototype;
 
 
 module.exports = TextPatch;
@@ -10,24 +14,38 @@ function TextPatch() {
     this.id = null;
     this.index = null;
     this.next = null;
+    this.props = null;
 }
 createPool(TextPatch);
+TextPatchPrototype = TextPatch.prototype;
 
-TextPatch.create = function(id, index, next) {
+TextPatch.create = function(id, index, next, props) {
     var patch = TextPatch.getPooled();
     patch.id = id;
     patch.index = index;
     patch.next = next;
+    patch.props = props;
     return patch;
 };
 
-TextPatch.prototype.destructor = function() {
+TextPatchPrototype.destructor = function() {
     this.id = null;
     this.index = null;
     this.next = null;
+    this.props = null;
     return this;
 };
 
-TextPatch.prototype.destroy = function() {
+TextPatchPrototype.destroy = function() {
     return TextPatch.release(this);
+};
+
+TextPatchPrototype.toJSON = function() {
+    return {
+        type: this.type,
+        id: this.id,
+        index: this.index,
+        next: this.next,
+        props: propsToJSON(this.props)
+    };
 };

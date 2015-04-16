@@ -333,6 +333,9 @@ NodePrototype.renderView = function() {
 
     renderedView = this.component.render();
 
+    renderedView.ref = currentView.ref;
+    renderedView.key = currentView.key;
+
     context.current = previousContext;
     owner.current = null;
 

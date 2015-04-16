@@ -25,7 +25,7 @@ function diffChildren(node, previous, next, transaction) {
         il = (previousLength > nextLength ? previousLength : nextLength) - 1;
 
     while (i++ < il) {
-        diffChild(root, node, previousChildren[i], nextChildren[i], parentId, i, transaction);
+        diffChild(root, node, previous, next, previousChildren[i], nextChildren[i], parentId, i, transaction);
     }
 
     if (nextChildren.moves) {
@@ -33,7 +33,7 @@ function diffChildren(node, previous, next, transaction) {
     }
 }
 
-function diffChild(root, parentNode, previousChild, nextChild, parentId, index, transaction) {
+function diffChild(root, parentNode, previous, next, previousChild, nextChild, parentId, index, transaction) {
     var node, id;
 
     if (previousChild !== nextChild) {
@@ -50,7 +50,7 @@ function diffChild(root, parentNode, previousChild, nextChild, parentId, index, 
             if (isNullOrUndefined(nextChild)) {
                 transaction.remove(parentId, null, index);
             } else if (isPrimativeView(nextChild)) {
-                transaction.text(parentId, index, nextChild);
+                transaction.text(parentId, index, nextChild, next.props);
             } else {
                 id = getChildKey(parentId, nextChild, index);
                 node = new Node(parentId, id, nextChild);

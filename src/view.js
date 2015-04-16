@@ -8,6 +8,7 @@ var isPrimitive = require("is_primitive"),
     fastSlice = require("fast_slice"),
     has = require("has"),
     map = require("map"),
+    propsToJSON = require("./utils/props_to_json"),
     owner = require("./owner"),
     context = require("./context");
 
@@ -128,19 +129,6 @@ function construct(type, config, children) {
     }
 
     return new View(type, key, ref, props, insureValidChildren(children), owner.current, context.current);
-}
-
-function propsToJSON(props) {
-    var out = {},
-        key, value;
-
-    for (key in props) {
-        if (!isFunction((value = props[key]))) {
-            out[key] = value;
-        }
-    }
-
-    return out;
 }
 
 function toJSON(view) {
