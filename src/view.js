@@ -64,12 +64,16 @@ View.create = function(type, config, children) {
     if (isChild(config) || isConfigArray) {
         if (isConfigArray) {
             children = config;
-        } else if (argumentsLength > 1) {
+        } else if (config && argumentsLength > 1) {
             children = fastSlice(arguments, 1);
         }
         config = null;
-    } else {
-        if (!isArray(children) && argumentsLength > 2) {
+    } else if (children) {
+        if (isArray(children)) {
+            children = children;
+        } else if (argumentsLength === 3) {
+            children = [children];
+        } else if (argumentsLength > 2) {
             children = fastSlice(arguments, 2);
         }
     }
@@ -85,12 +89,16 @@ View.createFactory = function(type) {
         if (isChild(config) || isConfigArray) {
             if (isConfigArray) {
                 children = config;
-            } else if (argumentsLength > 0) {
-                children = fastSlice(arguments);
+            } else if (config && argumentsLength > 0) {
+                children = fastSlice(arguments, 0);
             }
             config = null;
-        } else {
-            if (!isArray(children) && argumentsLength > 1) {
+        } else if (children) {
+            if (isArray(children)) {
+                children = children;
+            } else if (argumentsLength === 2) {
+                children = [children];
+            } else if (argumentsLength > 1) {
                 children = fastSlice(arguments, 1);
             }
         }
@@ -122,8 +130,10 @@ function construct(type, config, children) {
         defaultProps = type.defaultProps;
 
         for (propName in defaultProps) {
-            if (isNullOrUndefined(props[propName])) {
-                props[propName] = defaultProps[propName];
+            if (has(defaultProps, propName)) {
+                if (isNullOrUndefined(props[propName])) {
+                    props[propName] = defaultProps[propName];
+                }
             }
         }
     }
