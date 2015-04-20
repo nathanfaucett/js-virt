@@ -5,7 +5,6 @@ var isPrimitive = require("is_primitive"),
     isObjectLike = require("is_object_like"),
     isNullOrUndefined = require("is_null_or_undefined"),
     isNumber = require("is_number"),
-    fastSlice = require("fast_slice"),
     has = require("has"),
     map = require("map"),
     propsToJSON = require("./utils/props_to_json"),
@@ -64,17 +63,15 @@ View.create = function(type, config, children) {
     if (isChild(config) || isConfigArray) {
         if (isConfigArray) {
             children = config;
-        } else if (config && argumentsLength > 1) {
-            children = fastSlice(arguments, 1);
+        } else if (argumentsLength > 1) {
+            children = extractChildren(arguments, 1);
         }
         config = null;
     } else if (children) {
         if (isArray(children)) {
             children = children;
-        } else if (argumentsLength === 3) {
-            children = [children];
         } else if (argumentsLength > 2) {
-            children = fastSlice(arguments, 2);
+            children = extractChildren(arguments, 2);
         }
     }
 
@@ -90,16 +87,14 @@ View.createFactory = function(type) {
             if (isConfigArray) {
                 children = config;
             } else if (config && argumentsLength > 0) {
-                children = fastSlice(arguments, 0);
+                children = extractChildren(arguments, 0);
             }
             config = null;
         } else if (children) {
             if (isArray(children)) {
                 children = children;
-            } else if (argumentsLength === 2) {
-                children = [children];
             } else if (argumentsLength > 1) {
-                children = fastSlice(arguments, 1);
+                children = extractChildren(arguments, 1);
             }
         }
 
@@ -178,6 +173,22 @@ function isPrimativeView(object) {
 
 function isChild(object) {
     return isView(object) || isPrimativeView(object);
+}
+
+function extractChildren(args, offset) {
+    var children = [],
+        i = offset - 1,
+        il = args.length - 1,
+        arg;
+
+    while (i++ < il) {
+        arg = args[i];
+        if (!isNullOrUndefined(arg) && arg !== "" && !isArray(arg)) {
+            children[i] = arg;
+        }
+    }
+
+    return children;
 }
 
 function insureValidChildren(children) {

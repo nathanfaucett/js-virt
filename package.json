@@ -25,7 +25,6 @@
   "dependencies": {
     "create_pool": "git://github.com/nathanfaucett/create_pool",
     "extend": "git://github.com/nathanfaucett/extend",
-    "fast_slice": "git://github.com/nathanfaucett/fast_slice",
     "get_prototype_of": "git://github.com/nathanfaucett/get_prototype_of",
     "has": "git://github.com/nathanfaucett/has",
     "index_of": "git://github.com/nathanfaucett/index_of",
