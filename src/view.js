@@ -98,6 +98,8 @@ View.createFactory = function(type) {
             }
         }
 
+        console.log(type, config, children);
+
         return construct(type, config, children);
     };
 };
@@ -179,12 +181,13 @@ function extractChildren(args, offset) {
     var children = [],
         i = offset - 1,
         il = args.length - 1,
+        j = 0,
         arg;
 
     while (i++ < il) {
         arg = args[i];
         if (!isNullOrUndefined(arg) && arg !== "" && !isArray(arg)) {
-            children[i] = arg;
+            children[j++] = arg;
         }
     }
 
