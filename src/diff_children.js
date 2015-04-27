@@ -5,7 +5,7 @@ var isNullOrUndefined = require("is_null_or_undefined"),
     Node;
 
 
-var isPrimativeView = View.isPrimativeView;
+var isPrimitiveView = View.isPrimitiveView;
 
 
 module.exports = diffChildren;
@@ -38,7 +38,7 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
 
     if (previousChild !== nextChild) {
         if (isNullOrUndefined(previousChild)) {
-            if (isPrimativeView(nextChild)) {
+            if (isPrimitiveView(nextChild)) {
                 transaction.insert(parentId, null, index, nextChild);
             } else {
                 id = getChildKey(parentId, nextChild, index);
@@ -46,10 +46,10 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
                 parentNode.appendNode(node);
                 transaction.insert(parentId, id, index, node.__mount(transaction));
             }
-        } else if (isPrimativeView(previousChild)) {
+        } else if (isPrimitiveView(previousChild)) {
             if (isNullOrUndefined(nextChild)) {
                 transaction.remove(parentId, null, index);
-            } else if (isPrimativeView(nextChild)) {
+            } else if (isPrimitiveView(nextChild)) {
                 transaction.text(parentId, index, nextChild, next.props);
             } else {
                 id = getChildKey(parentId, nextChild, index);
@@ -63,7 +63,7 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
                 node = root.childHash[id];
                 node.unmount(transaction);
                 parentNode.removeNode(node);
-            } else if (isPrimativeView(nextChild)) {
+            } else if (isPrimitiveView(nextChild)) {
                 transaction.replace(parentId, null, index, nextChild);
             } else {
                 id = getChildKey(parentId, previousChild, index);

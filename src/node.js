@@ -17,7 +17,7 @@ var has = require("has"),
 
 
 var NodePrototype,
-    isPrimativeView = View.isPrimativeView;
+    isPrimitiveView = View.isPrimitiveView;
 
 
 module.exports = Node;
@@ -138,7 +138,7 @@ NodePrototype.__mountChildren = function(renderedView, transaction) {
     renderedView.children = map(renderedView.children, function(child, index) {
         var node, id;
 
-        if (isPrimativeView(child)) {
+        if (isPrimitiveView(child)) {
             return child;
         } else {
             id = getChildKey(parentId, child, index);

@@ -52,7 +52,7 @@ ViewPrototype.toJSON = function() {
 };
 
 View.isView = isView;
-View.isPrimativeView = isPrimativeView;
+View.isPrimitiveView = isPrimitiveView;
 View.isViewComponent = isViewComponent;
 View.isViewJSON = isViewJSON;
 
@@ -169,12 +169,12 @@ function isViewJSON(obj) {
     );
 }
 
-function isPrimativeView(object) {
+function isPrimitiveView(object) {
     return isString(object) || isNumber(object);
 }
 
 function isChild(object) {
-    return isView(object) || isPrimativeView(object);
+    return isView(object) || isPrimitiveView(object);
 }
 
 function extractChildren(args, offset) {
@@ -206,7 +206,7 @@ function insureValidChildren(children) {
 
             if (isView(child)) {
                 continue;
-            } else if (isPrimativeView(child)) {
+            } else if (isPrimitiveView(child)) {
                 children[i] = child;
             } else {
                 throw new TypeError("child of a View must be a String, Number or a View");
