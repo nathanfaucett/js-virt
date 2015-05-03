@@ -23,7 +23,6 @@ function Root() {
     this.__transactions = [];
     this.__currentTransaction = null;
 }
-
 RootPrototype = Root.prototype;
 
 RootPrototype.appendNode = function(node) {
