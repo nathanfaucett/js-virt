@@ -111,11 +111,17 @@ TransactionPrototype.remove = function(id, childId, index) {
 };
 
 TransactionPrototype.event = function(id, type) {
-    this.events[id] = type;
+    var events = this.events,
+        eventArray = events[id] || (events[id] = []);
+
+    eventArray[eventArray.length] = type;
 };
 
 TransactionPrototype.removeEvent = function(id, type) {
-    this.eventsRemove[id] = type;
+    var eventsRemove = this.eventsRemove,
+        eventArray = eventsRemove[id] || (eventsRemove[id] = []);
+
+    eventArray[eventArray.length] = type;
 };
 
 function append(hash, value) {
