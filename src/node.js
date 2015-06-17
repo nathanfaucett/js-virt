@@ -360,10 +360,15 @@ NodePrototype.__checkTypes = function(propTypes, props) {
 };
 
 NodePrototype.__processProps = function(props) {
-    var propTypes;
+    var type = this.currentView.type,
+        propTypes;
+
+    if (type.getDefaultProps) {
+        props = extend(type.getDefaultProps(), props);
+    }
 
     if (process.env.NODE_ENV !== "production") {
-        propTypes = this.currentView.type.propTypes;
+        propTypes = type.propTypes;
 
         if (propTypes) {
             this.__checkTypes(propTypes, props);
