@@ -1,20 +1,68 @@
 var test = require("tape"),
     View = require("../src/view"),
+    createComponent = require("./utils/createComponent")
     createRoot = require("./utils/createRoot");
 
 
 function emptyFunction() {}
 
 
-test("event", function(assert) {
-    var root = createRoot(function() {
-        assert.equal(root.eventManager.events.topEvent[root.id], emptyFunction, "event should be added to eventManager");
-        assert.end();
+test("event", function(t) {
+    var hits = 0;
+    
+    var root = createRoot(function(transaction) {
+        
+        hits++;
+        
+        if (hits === 2) {
+            var patch = transaction.patches[root.id][0];
+
+            var incomingEvent = root.eventManager.events.topEvent[root.id];
+
+            t.equal(patch.type, "TEXT", "text patch after update");
+            t.equal(patch.next, "foo", "accepts foo on componentDidMount");
+
+            // todo: fixme component state is UPDATING if we
+            // don't use setTimeout
+            setTimeout(function() {
+                incomingEvent({ data: "bar" });
+            }, 100);
+            
+
+        }
+
+        if (hits === 3) {
+            var patch = transaction.patches[root.id][0];
+
+            t.equal(patch.type, "TEXT", "text text after event causes state update");
+            t.equal(patch.next, "bar", "accepts bar from setState");
+
+            t.end();
+            return
+        }
+        
     });
 
-    root.render(
-        View.create("div", {
-            onEvent: emptyFunction
-        })
-    );
+    var Component = createComponent({ text: "default" });
+
+    Component.prototype.render = function() {
+        
+        var _this = this;
+
+        return (
+            View.create("p", { 
+                onEvent: function(event) {
+                    _this.setState({ text: event.data });
+                }
+            }, _this.state.text )
+        );
+
+    }
+
+    Component.prototype.componentDidMount = function() {
+        this.setState({ text: "foo" });
+    }
+
+    root.render(View.create(Component));
+
 });

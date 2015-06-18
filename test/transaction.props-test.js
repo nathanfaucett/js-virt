@@ -39,10 +39,6 @@ test("transaction triggers props patch", function(t) {
 
     }
 
-    component.prototype.componentDidMount = function() {
-
-    }
-
     root.render(View.create(component, { age: 1 }));
     root.render(View.create(component, { age: 2 }))
     
