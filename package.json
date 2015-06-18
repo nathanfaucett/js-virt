@@ -12,6 +12,9 @@
     "virt.js"
   ],
   "scripts": {
+    "test-node" : "node ./test/*.js | ./node_modules/.bin/tap-spec",
+    "test-node-raw": "node ./test/*.js",
+    "test-browser-local": "zuul --local 8080 --ui tape -- ./test/*.js",
     "example": "comn -f example/src/index.js -o example/index.js"
   },
   "author": "Nathan Faucett",
@@ -20,7 +23,10 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
-    "grunt-jsbeautifier": "^0.2.7"
+    "grunt-jsbeautifier": "^0.2.7",
+    "tap-spec": "^4.0.0",
+    "tape": "^4.0.0",
+    "zuul": "^3.0.0"
   },
   "dependencies": {
     "create_pool": "git://github.com/nathanfaucett/create_pool",

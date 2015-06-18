@@ -62,15 +62,15 @@ ComponentPrototype.getId = function() {
 };
 
 ComponentPrototype.emitMessage = function(name, data, callback) {
-    this.__node.root.adaptor.messenger.emit(name, data, callback);
+    this.__node.root.adapter.messenger.emit(name, data, callback);
 };
 
 ComponentPrototype.onMessage = function(name, callback) {
-    this.__node.root.adaptor.messenger.on(name, callback);
+    this.__node.root.adapter.messenger.on(name, callback);
 };
 
 ComponentPrototype.offMessage = function(name, callback) {
-    this.__node.root.adaptor.messenger.off(name, callback);
+    this.__node.root.adapter.messenger.off(name, callback);
 };
 
 ComponentPrototype.getChildContext = function() {};

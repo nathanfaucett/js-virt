@@ -9,7 +9,7 @@ var virt = require("virt");
 
 var root = new virt.Root();
 
-root.adaptor = {
+root.adapter = {
     handle: function(transaction, callback) {
         // handle transaction
         callback();

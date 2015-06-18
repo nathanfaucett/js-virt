@@ -18,7 +18,7 @@ function Root() {
 
     this.eventManager = new EventManager();
 
-    this.adaptor = null;
+    this.adapter = null;
 
     this.__transactions = [];
     this.__currentTransaction = null;
@@ -57,7 +57,7 @@ RootPrototype.__processTransaction = function() {
     if (this.__currentTransaction === null && transactions.length !== 0) {
         this.__currentTransaction = transaction = transactions[0];
 
-        this.adaptor.handle(transaction, function onHandle() {
+        this.adapter.handle(transaction, function onHandle() {
             transactions.splice(0, 1);
 
             transaction.queue.notifyAll();

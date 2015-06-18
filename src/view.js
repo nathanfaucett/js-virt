@@ -98,8 +98,6 @@ View.createFactory = function(type) {
             }
         }
 
-        console.log(type, config, children);
-
         return construct(type, config, children);
     };
 };
@@ -135,7 +133,7 @@ function construct(type, config, children) {
         }
     }
 
-    return new View(type, key, ref, props, insureValidChildren(children), owner.current, context.current);
+    return new View(type, key, ref, props, ensureValidChildren(children), owner.current, context.current);
 }
 
 function toJSON(view) {
@@ -194,7 +192,7 @@ function extractChildren(args, offset) {
     return children;
 }
 
-function insureValidChildren(children) {
+function ensureValidChildren(children) {
     var i, il, child;
 
     if (isArray(children)) {
