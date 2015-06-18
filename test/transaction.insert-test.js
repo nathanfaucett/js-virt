@@ -36,17 +36,15 @@ test("transaction triggers insert patch", function(t) {
         
     });
 
-    var state = { insertNode: false };
+    var Component = createComponent({ insertNode: false });
 
-    var component = createComponent(state);
-
-    component.prototype.render = function() {
+    Component.prototype.render = function() {
         var s = this.state;
 
         if (s.insertNode) {
 
             return (
-                View.create("div", {}, 
+                View.create("div", null,
                     View.create("p", { key: "p.key", ref: "p.ref" }, "p-tag")
                 )
             );
@@ -54,7 +52,7 @@ test("transaction triggers insert patch", function(t) {
         } else {
 
             return (
-                View.create("div", {}, 
+                View.create("div", null,
                     View.create("a", { key: "a.key", ref: "a.ref" }, "a-tag")
                 )
             );
@@ -62,11 +60,14 @@ test("transaction triggers insert patch", function(t) {
         }
 
     }
+    
+    Component.prototype.componentDidMount = function() {
+        this.setState({ insertNode: true });
+    };
 
-    var vc = View.create(component, { key: 'component.key'}); 
-    root.render(vc); // calls mount
-    state.insertNode = true;
-    root.render(vc);
+    root.render(View.create(Component, { key: 'component.key'})); // calls mount
+    
+    
 
     
 });

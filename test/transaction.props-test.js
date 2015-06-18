@@ -16,44 +16,34 @@ test("transaction triggers props patch", function(t) {
 
         var patches = transaction.patches;
 
-        console.log(patches);
-
         if (hits === 2) {
             var patch = patches[root.id][0];
 
             t.equal(patch.id, root.id, "patch id should be on root");
-            t.equal(patch.type, "REPLACE", "state change for text triggers REPLACE patch");
+            t.equal(patch.type, "PROPS", "state change for props triggers PROPS patch");
             t.deepEqual(patch.next, {
-                __owner: null,
-                __context: null,
-                type: "p",
-                key: null,
-                ref: null,
-                props: {},
-                children: [ "p-tag" ]
-            }, "takes in next replace patch");
+                age: 2
+            }, "takes in next props patch");
 
             t.end();
         }
         
     });
 
-    var state = { replaceNode: false };
 
-    var component = createComponent(state);
+    var component = createComponent();
 
     component.prototype.render = function() {
-        
-        return View.create("p", { key: "p.key", ref: "p.ref" }, "p-tag");
+
+        return View.create("p", { key: "p.key", ref: "p.ref", age: this.props.age }, "p-tag");
 
     }
 
-    var props = { age: 1 };
+    component.prototype.componentDidMount = function() {
 
-    var vc = View.create(component, props); 
-    root.render(vc); // calls mount
-    props.age = 2;
-    root.render(vc);
+    }
 
+    root.render(View.create(component, { age: 1 }));
+    root.render(View.create(component, { age: 2 }))
     
 });
