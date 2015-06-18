@@ -5,38 +5,44 @@ var test = require("tape"),
 
 test("View.create", function(t) {
 
-  var divView = View.create("div", { 
-                    className: 'foo',
-                    key: 'div-key',
-                    ref: 'divElem'
-                });
+    var divView = View.create("div", {
+        className: 'foo',
+        key: 'div-key',
+        ref: 'divElem'
+    });
 
-  t.equal(divView.type, "div", "constructs correct type");
-  t.equal(divView.key, "div-key", "constructs correct key");
-  t.equal(divView.ref, "divElem", "constructs correct ref");
-  t.equal(divView.props.className, "foo", "adds non-special config options to props");
+    t.equal(divView.type, "div", "constructs correct type");
+    t.equal(divView.key, "div-key", "constructs correct key");
+    t.equal(divView.ref, "divElem", "constructs correct ref");
+    t.equal(divView.props.className, "foo", "adds non-special config options to props");
 
-  var tmpComponent = function(props, children, context) {
-    Component.call(this, props, children, context);
-  }
-  Component.extend(tmpComponent, "tmpComponent");
-  tmpComponent.defaultProps = {
-    foo: "bar"
-  };
+    function tmpComponent(props, children, context) {
+        Component.call(this, props, children, context);
+    }
+    Component.extend(tmpComponent, "tmpComponent");
+    tmpComponent.defaultProps = {
+        foo: "bar"
+    };
 
-  var cv = View.create(tmpComponent, { className: "c" });
-  t.equal(isFunction(cv.type), true, "creates view of type function from component");
-  t.equal(View.isViewComponent(cv), true, "creates a view component");
-  t.equal(cv.props.foo, "bar", "sets defaultProps");
-  t.equal(cv.props.className, "c", "merges in defaultProps with passed props")
+    var cv = View.create(tmpComponent, {
+        className: "c"
+    });
+    t.equal(isFunction(cv.type), true, "creates view of type function from component");
+    t.equal(View.isViewComponent(cv), true, "creates a view component");
+    t.equal(cv.props.foo, "bar", "sets defaultProps");
+    t.equal(cv.props.className, "c", "merges in defaultProps with passed props");
 
-  t.end();
+    t.end();
 
 });
 
 test("View.create with children", function(t) {
-    var tmp = View.create("div", { key: "d" },
-        View.create("span", { className: "s"}),
+    var tmp = View.create("div", {
+            key: "d"
+        },
+        View.create("span", {
+            className: "s"
+        }),
         "hello world",
         45
     );
@@ -47,8 +53,12 @@ test("View.create with children", function(t) {
     t.equal(View.isPrimitiveView(tmp.children[2]), true, "number is primitive view");
 
     var tmp2 = View.create("div", [
-        View.create("span", { ref: "s"}),
-        View.create("p", { ref: "p"}),
+        View.create("span", {
+            ref: "s"
+        }),
+        View.create("p", {
+            ref: "p"
+        }),
         "hello world"
     ]);
 
@@ -68,7 +78,11 @@ test("View.createFactory", function(t) {
 
     var spanView = View.createFactory("span");
 
-    var sv = spanView({ className: "s", ref: "s", key: "s" }, [
+    var sv = spanView({
+        className: "s",
+        ref: "s",
+        key: "s"
+    }, [
         "hello world"
     ]);
 
@@ -82,8 +96,14 @@ test("View.createFactory", function(t) {
 
 test("View.copy", function(t) {
 
-    var spanView = View.create("span", { key: "s", ref: "s", className: "s" }),
-        divView = View.create("div", { className: "d" });
+    var spanView = View.create("span", {
+            key: "s",
+            ref: "s",
+            className: "s"
+        }),
+        divView = View.create("div", {
+            className: "d"
+        });
 
     var copyResult = spanView.copy(divView);
 
@@ -98,8 +118,12 @@ test("View.copy", function(t) {
 
 test("View.clone", function(t) {
 
-    var tmp = View.create("span", { key: "s", ref: "s", foo: "bar" }),
-        t2  = tmp.clone();
+    var tmp = View.create("span", {
+            key: "s",
+            ref: "s",
+            foo: "bar"
+        }),
+        t2 = tmp.clone();
 
     t.equal(t2.key, "s", "clones key");
     t.equal(t2.ref, "s", "clones ref");
@@ -111,7 +135,9 @@ test("View.clone", function(t) {
 
 test("View.toJSON", function(t) {
 
-    var tmp = View.create("div", { className: "d" }, [
+    var tmp = View.create("div", {
+        className: "d"
+    }, [
         View.create("span"),
         "primitive view"
     ]);
@@ -120,4 +146,4 @@ test("View.toJSON", function(t) {
     t.equal(View.isViewJSON(tmpJson), true, "converts view to JSON");
 
     t.end();
-})
+});

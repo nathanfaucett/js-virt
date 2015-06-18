@@ -12,10 +12,9 @@
     "virt.js"
   ],
   "scripts": {
-    "test-node" : "node ./test/*.js | ./node_modules/.bin/tap-spec",
-    "test-node-raw": "node ./test/*.js",
-    "test-browser-local": "zuul --local 8080 --ui tape -- ./test/*.js",
-    "example": "comn -f example/src/index.js -o example/index.js"
+    "test-node" : "node ./test | ./node_modules/.bin/tap-spec",
+    "test-node-raw": "node ./test",
+    "test-browser-local": "zuul --local 8080 --ui tape -- ./test"
   },
   "author": "Nathan Faucett",
   "license": "BSD-2-Clause",
