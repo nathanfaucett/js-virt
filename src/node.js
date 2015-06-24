@@ -4,6 +4,7 @@ var has = require("has"),
     isString = require("is_string"),
     isFunction = require("is_function"),
     extend = require("extend"),
+    mixin = require("mixin"),
     owner = require("./owner"),
     context = require("./context"),
     shouldUpdate = require("./utils/should_update"),
@@ -375,7 +376,7 @@ NodePrototype.__processProps = function(props) {
         propTypes;
 
     if (type.getDefaultProps) {
-        props = extend(type.getDefaultProps(), props);
+        props = mixin(type.getDefaultProps(), props);
     }
 
     if (process.env.NODE_ENV !== "production") {
