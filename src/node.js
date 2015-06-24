@@ -376,7 +376,7 @@ NodePrototype.__processProps = function(props) {
         propTypes;
 
     if (type.getDefaultProps) {
-        props = mixin(type.getDefaultProps(), props);
+        props = mixin({}, props, type.getDefaultProps());
     }
 
     if (process.env.NODE_ENV !== "production") {
