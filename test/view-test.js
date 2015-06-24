@@ -35,7 +35,7 @@ test("View.create", function(t) {
     t.throws(function() {
         var invalidChildType = function() {};
         View.create(tmpComponent, {}, invalidChildType);
-    }, /child of a View must be a String, Number or a View/, "child must be String, Number, or View" );
+    }, /child of a View must be a String, Number or a View/, "child must be String, Number, or View");
 
     t.end();
 

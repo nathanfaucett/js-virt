@@ -5,4 +5,3 @@ require("./transaction.insert-test");
 require("./transaction.replace-test");
 require("./transaction.props-test");
 require("./view-test");
-

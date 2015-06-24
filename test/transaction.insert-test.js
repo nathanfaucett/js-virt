@@ -4,14 +4,11 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-function emptyFunction() {}
-
-
 test("transaction triggers insert patch", function(t) {
 
     var hits = 0;
     var root = createRoot(function(transaction) {
-        
+
         hits++;
 
         var patches = transaction.patches;
@@ -28,15 +25,17 @@ test("transaction triggers insert patch", function(t) {
                 key: "p.key",
                 ref: "p.ref",
                 props: {},
-                children: [ "p-tag" ]
+                children: ["p-tag"]
             }, "takes in correct next insert patch");
 
             t.end();
         }
-        
+
     });
 
-    var Component = createComponent({ insertNode: false });
+    var Component = createComponent({
+        insertNode: false
+    });
 
     Component.prototype.render = function() {
         var s = this.state;
@@ -45,7 +44,10 @@ test("transaction triggers insert patch", function(t) {
 
             return (
                 View.create("div", null,
-                    View.create("p", { key: "p.key", ref: "p.ref" }, "p-tag")
+                    View.create("p", {
+                        key: "p.key",
+                        ref: "p.ref"
+                    }, "p-tag")
                 )
             );
 
@@ -53,21 +55,28 @@ test("transaction triggers insert patch", function(t) {
 
             return (
                 View.create("div", null,
-                    View.create("a", { key: "a.key", ref: "a.ref" }, "a-tag")
+                    View.create("a", {
+                        key: "a.key",
+                        ref: "a.ref"
+                    }, "a-tag")
                 )
             );
 
         }
 
-    }
-    
-    Component.prototype.componentDidMount = function() {
-        this.setState({ insertNode: true });
     };
 
-    root.render(View.create(Component, { key: 'component.key'})); // calls mount
-    
-    
+    Component.prototype.componentDidMount = function() {
+        this.setState({
+            insertNode: true
+        });
+    };
 
-    
+    root.render(View.create(Component, {
+        key: 'component.key'
+    })); // calls mount
+
+
+
+
 });

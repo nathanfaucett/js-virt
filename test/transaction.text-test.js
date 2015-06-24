@@ -4,14 +4,11 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-function emptyFunction() {}
-
-
 test("transaction triggers text patch", function(t) {
 
     var hits = 0;
     var root = createRoot(function(transaction) {
-        
+
         hits++;
 
         var patches = transaction.patches;
@@ -25,10 +22,12 @@ test("transaction triggers text patch", function(t) {
 
             t.end();
         }
-        
+
     });
 
-    var state = { text: "foo" };
+    var state = {
+        text: "foo"
+    };
 
     var component = createComponent(state);
 
@@ -36,20 +35,22 @@ test("transaction triggers text patch", function(t) {
         var s = this.state;
 
         return (
-            View.create("div", { 
-                key: "div.key"
-            }, 
-                View.create("div", {  },
+            View.create("div", {
+                    key: "div.key"
+                },
+                View.create("div", {},
                     s.text
                 )
             )
         );
-    }
+    };
 
-    var vc = View.create(component, { key: 'component.key'}); 
+    var vc = View.create(component, {
+        key: 'component.key'
+    });
     root.render(vc); // calls mount
     state.text = "bar";
     root.render(vc);
 
-    
+
 });

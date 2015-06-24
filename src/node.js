@@ -502,7 +502,7 @@ function attachRef(component, ref, owner) {
         } else {
             throw new Error("cannot add ref to view without owner");
         }
-        
+
     }
 }
 

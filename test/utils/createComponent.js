@@ -9,9 +9,9 @@ function createComponent(state) {
         Component.call(this, props, children, context);
 
         this.state = state || {};
-    }
+    };
 
     Component.extend(tc, "__test_component__");
-    
+
     return tc;
 }

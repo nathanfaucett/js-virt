@@ -4,14 +4,11 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-function emptyFunction() {}
-
-
 test("transaction triggers insert patch", function(t) {
 
     var hits = 0;
     var root = createRoot(function(transaction) {
-        
+
         hits++;
 
         var patches = transaction.patches;
@@ -28,18 +25,20 @@ test("transaction triggers insert patch", function(t) {
                 key: "parent.key",
                 ref: null,
                 props: {},
-                children: [ "p-tag" ]
+                children: ["p-tag"]
             }, "takes in next replace patch");
 
             t.end();
         }
-        
+
     });
 
-    var component = createComponent({ replaceNode: false });
+    var component = createComponent({
+        replaceNode: false
+    });
 
     component.prototype.render = function() {
-        
+
         var s = this.state;
 
         if (s.replaceNode) {
@@ -52,13 +51,17 @@ test("transaction triggers insert patch", function(t) {
 
         }
 
-    }
-
-    component.prototype.componentDidMount = function() {
-        this.setState({ replaceNode: true });
     };
 
-    root.render(View.create(component, { key: "parent.key"})); // calls mount
+    component.prototype.componentDidMount = function() {
+        this.setState({
+            replaceNode: true
+        });
+    };
 
-    
+    root.render(View.create(component, {
+        key: "parent.key"
+    })); // calls mount
+
+
 });

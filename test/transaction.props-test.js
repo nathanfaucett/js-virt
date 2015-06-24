@@ -4,14 +4,11 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-function emptyFunction() {}
-
-
 test("transaction triggers props patch", function(t) {
 
     var hits = 0;
     var root = createRoot(function(transaction) {
-        
+
         hits++;
 
         var patches = transaction.patches;
@@ -27,7 +24,7 @@ test("transaction triggers props patch", function(t) {
 
             t.end();
         }
-        
+
     });
 
 
@@ -35,11 +32,19 @@ test("transaction triggers props patch", function(t) {
 
     component.prototype.render = function() {
 
-        return View.create("p", { key: "p.key", ref: "p.ref", age: this.props.age }, "p-tag");
+        return View.create("p", {
+            key: "p.key",
+            ref: "p.ref",
+            age: this.props.age
+        }, "p-tag");
 
-    }
+    };
 
-    root.render(View.create(component, { age: 1 }));
-    root.render(View.create(component, { age: 2 }))
-    
+    root.render(View.create(component, {
+        age: 1
+    }));
+    root.render(View.create(component, {
+        age: 2
+    }));
+
 });
