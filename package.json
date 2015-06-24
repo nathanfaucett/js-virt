@@ -20,9 +20,11 @@
   "license": "BSD-2-Clause",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "core.keys": "git://github.com/bakasho-libs/core.keys.git",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-jsbeautifier": "^0.2.7",
+    "prop_types": "git://github.com/nathanfaucett/prop_types.git",
     "tap-spec": "^4.0.0",
     "tape": "^4.0.0",
     "zuul": "^3.0.0"
