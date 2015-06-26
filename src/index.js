@@ -9,6 +9,7 @@ virt.Root = require("./root");
 virt.Component = require("./component");
 
 virt.View = View;
+virt.cloneView = View.clone;
 virt.createView = View.create;
 virt.createFactory = View.createFactory;
 
