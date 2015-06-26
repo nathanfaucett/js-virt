@@ -2,6 +2,7 @@ var has = require("has"),
     map = require("map"),
     indexOf = require("index_of"),
     isString = require("is_string"),
+    isArray = require("is_array"),
     isFunction = require("is_function"),
     extend = require("extend"),
     mixin = require("mixin"),
@@ -354,6 +355,20 @@ NodePrototype.renderView = function() {
     return renderedView;
 };
 
+function warnError(error) {
+    var i, il;
+
+    if (isArray(error)) {
+        i = -1;
+        il = error.length - 1;
+        while (i++ < il) {
+            warnError(error[i]);
+        }
+    } else {
+        console.warn(error);
+    }
+}
+
 NodePrototype.__checkTypes = function(propTypes, props) {
     var localHas = has,
         displayName = this.__getName(),
@@ -363,8 +378,8 @@ NodePrototype.__checkTypes = function(propTypes, props) {
         for (propName in propTypes) {
             if (localHas(propTypes, propName)) {
                 error = propTypes[propName](props, propName, displayName);
-                if (error !== null) {
-                    console.warn(error);
+                if (error) {
+                    warnError(error);
                 }
             }
         }

@@ -36,7 +36,7 @@
     "has": "git://github.com/nathanfaucett/has",
     "index_of": "git://github.com/nathanfaucett/index_of",
     "inherits": "git://github.com/nathanfaucett/inherits",
-    "is_array": "git://github.com/nathanfaucett/is_array",
+    "is_array": "git://github.com/nathanfaucett/is_array.git",
     "is_function": "git://github.com/nathanfaucett/is_function",
     "is_null_or_undefined": "git://github.com/nathanfaucett/is_null_or_undefined",
     "is_number": "git://github.com/nathanfaucett/is_number",
