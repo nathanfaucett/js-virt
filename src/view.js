@@ -7,6 +7,7 @@ var isPrimitive = require("is_primitive"),
     isNumber = require("is_number"),
     has = require("has"),
     map = require("map"),
+    extend = require("extend"),
     propsToJSON = require("./utils/props_to_json"),
     owner = require("./owner"),
     context = require("./context");
@@ -55,6 +56,54 @@ View.isView = isView;
 View.isPrimitiveView = isPrimitiveView;
 View.isViewComponent = isViewComponent;
 View.isViewJSON = isViewJSON;
+View.toJSON = toJSON;
+
+View.clone = function(view, config, children) {
+    var props = extend({}, view.props),
+        key = view.key,
+        ref = view.ref,
+        viewOwner = view.__owner,
+
+        isConfigArray = isArray(config),
+        argumentsLength = arguments.length,
+
+        propName;
+
+    if (isChild(config) || isConfigArray) {
+        if (isConfigArray) {
+            children = config;
+        } else if (argumentsLength > 1) {
+            children = extractChildren(arguments, 1);
+        }
+        config = null;
+    } else if (children) {
+        if (isArray(children)) {
+            children = children;
+        } else if (argumentsLength > 2) {
+            children = extractChildren(arguments, 2);
+        }
+    }
+
+    if (config) {
+        if (config.ref) {
+            ref = config.ref;
+            viewOwner = owner.current;
+        }
+        if (config.key) {
+            key = config.key;
+        }
+
+        for (propName in config) {
+            if (has(config, propName)) {
+                if (!(propName === "key" || propName === "ref")) {
+                    props[propName] = config[propName];
+                }
+            }
+        }
+    }
+
+    return new View(view.type, key, ref, props, children, viewOwner, context.current);
+};
 
 View.create = function(type, config, children) {
     var isConfigArray = isArray(config),

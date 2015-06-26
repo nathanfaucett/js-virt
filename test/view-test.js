@@ -99,7 +99,7 @@ test("View.createFactory", function(t) {
     t.end();
 });
 
-test("View.copy", function(t) {
+test("View.prototype.copy", function(t) {
 
     var spanView = View.create("span", {
             key: "s",
@@ -121,7 +121,7 @@ test("View.copy", function(t) {
     t.end();
 });
 
-test("View.clone", function(t) {
+test("View.prototype.clone", function(t) {
 
     var tmp = View.create("span", {
             key: "s",
@@ -138,7 +138,30 @@ test("View.clone", function(t) {
     t.end();
 });
 
-test("View.toJSON", function(t) {
+test("View.clone", function(t) {
+    var tmp = View.create("span", {
+            key: "s",
+            ref: "s",
+            foo: "bar"
+        }),
+        tmp2 = View.clone(tmp, {
+            key: "new",
+            ref: "new",
+            foo: "foo"
+        }, "Child");
+
+    t.equal(tmp2.type, "span");
+    t.equal(tmp2.key, "new");
+    t.equal(tmp2.ref, "new");
+    t.deepEqual(tmp2.props, {
+        foo: "foo"
+    });
+    t.deepEqual(tmp2.children[0], "Child");
+
+    t.end();
+});
+
+test("View.prototype.toJSON", function(t) {
 
     var tmp = View.create("div", {
         className: "d"
