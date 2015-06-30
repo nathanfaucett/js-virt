@@ -91,9 +91,9 @@ NodePrototype.mountComponent = function() {
     this.component = component;
 
     component.__node = this;
-    component.props = props;
-    component.children = children;
-    component.context = context;
+    component.props = component.props || props;
+    component.children = component.children || children;
+    component.context = component.context || context;
 };
 
 NodePrototype.mount = function(transaction) {
