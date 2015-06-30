@@ -2,14 +2,14 @@ var createPool = require("create_pool"),
     Queue = require("queue"),
     has = require("has"),
     consts = require("./consts"),
-    InsertPatch = require("./insert_patch"),
-    MountPatch = require("./mount_patch"),
-    UnmountPatch = require("./unmount_patch"),
-    OrderPatch = require("./order_patch"),
-    PropsPatch = require("./props_patch"),
-    RemovePatch = require("./remove_patch"),
-    ReplacePatch = require("./replace_patch"),
-    TextPatch = require("./text_patch");
+    InsertPatch = require("./InsertPatch"),
+    MountPatch = require("./MountPatch"),
+    UnmountPatch = require("./UnmountPatch"),
+    OrderPatch = require("./OrderPatch"),
+    PropsPatch = require("./PropsPatch"),
+    RemovePatch = require("./RemovePatch"),
+    ReplacePatch = require("./ReplacePatch"),
+    TextPatch = require("./TextPatch");
 
 
 var TransactionPrototype;

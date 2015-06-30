@@ -8,7 +8,7 @@ var isPrimitive = require("is_primitive"),
     has = require("has"),
     map = require("map"),
     extend = require("extend"),
-    propsToJSON = require("./utils/props_to_json"),
+    propsToJSON = require("./utils/propsToJSON"),
     owner = require("./owner"),
     context = require("./context");
 
@@ -242,20 +242,14 @@ function extractChildren(args, offset) {
 }
 
 function ensureValidChildren(children) {
-    var i, il, child;
+    var i, il;
 
     if (isArray(children)) {
         i = -1;
         il = children.length - 1;
 
         while (i++ < il) {
-            child = children[i];
-
-            if (isView(child)) {
-                continue;
-            } else if (isPrimitiveView(child)) {
-                children[i] = child;
-            } else {
+            if (!isChild(children[i])) {
                 throw new TypeError("child of a View must be a String, Number or a View");
             }
         }

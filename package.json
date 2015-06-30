@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "create_pool": "git://github.com/nathanfaucett/create_pool",
+    "empty_function": "git://github.com/nathanfaucett/empty_function.git",
     "extend": "git://github.com/nathanfaucett/extend",
     "get_prototype_of": "git://github.com/nathanfaucett/get_prototype_of",
     "has": "git://github.com/nathanfaucett/has",
@@ -42,7 +43,7 @@
     "is_number": "git://github.com/nathanfaucett/is_number",
     "is_object": "git://github.com/nathanfaucett/is_object",
     "is_object_like": "git://github.com/nathanfaucett/is_object_like",
-    "is_primitive": "git://github.com/nathanfaucett/is_primitive",
+    "is_primitive": "git://github.com/nathanfaucett/is_primitive.git",
     "is_string": "git://github.com/nathanfaucett/is_string",
     "key_mirror": "git://github.com/nathanfaucett/key_mirror",
     "map": "git://github.com/nathanfaucett/map",

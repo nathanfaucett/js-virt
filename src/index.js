@@ -1,27 +1,27 @@
-var View = require("./view");
+var View = require("./View");
 
 
 var virt = exports;
 
 
-virt.Root = require("./root");
+virt.Root = require("./Root");
 
-virt.Component = require("./component");
+virt.Component = require("./Component");
 
 virt.View = View;
 virt.cloneView = View.clone;
 virt.createView = View.create;
 virt.createFactory = View.createFactory;
 
-virt.consts = require("./transaction/consts");
+virt.consts = require("./Transaction/consts");
 
-virt.getChildKey = require("./utils/get_child_key");
+virt.getChildKey = require("./utils/getChildKey");
 
-virt.registerNativeComponent = require("./utils/register_native_component");
+virt.registerNativeComponent = require("./utils/registerNativeComponent");
 
-virt.traverseAncestors = require("./utils/traverse_ancestors");
-virt.traverseDescendants = require("./utils/traverse_descendants");
-virt.traverseTwoPhase = require("./utils/traverse_two_phase");
+virt.traverseAncestors = require("./utils/traverseAncestors");
+virt.traverseDescendants = require("./utils/traverseDescendants");
+virt.traverseTwoPhase = require("./utils/traverseTwoPhase");
 
 virt.context = require("./context");
 virt.owner = require("./owner");

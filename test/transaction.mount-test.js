@@ -1,5 +1,5 @@
 var test = require("tape"),
-    View = require("../src/view"),
+    View = require("../src/View"),
     createRoot = require("./utils/createRoot");
 
 

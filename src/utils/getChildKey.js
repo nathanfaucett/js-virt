@@ -1,4 +1,4 @@
-var getViewKey = require("./get_view_key");
+var getViewKey = require("./getViewKey");
 
 
 module.exports = getChildKey;

@@ -1,4 +1,4 @@
-var nativeComponents = require("./native_components");
+var nativeComponents = require("./nativeComponents");
 
 
 module.exports = registerNativeComponent;
@@ -6,4 +6,5 @@ module.exports = registerNativeComponent;
 
 function registerNativeComponent(type, constructor) {
     nativeComponents[type] = constructor;
+    return constructor;
 }

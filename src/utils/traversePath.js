@@ -1,5 +1,5 @@
-var isBoundary = require("./is_boundary"),
-    isAncestorIdOf = require("./is_ancestor_id_of");
+var isBoundary = require("./isBoundary"),
+    isAncestorIdOf = require("./isAncestorIdOf");
 
 
 module.exports = traversePath;

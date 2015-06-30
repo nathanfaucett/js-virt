@@ -1,5 +1,5 @@
-var View = require("../view"),
-    Component = require("../component");
+var View = require("../View"),
+    Component = require("../Component");
 
 
 module.exports = createNativeComponentForType;

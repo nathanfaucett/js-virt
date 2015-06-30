@@ -1,7 +1,7 @@
 var test = require("tape"),
-    Component = require("../src/component"),
     isFunction = require("is_function"),
-    View = require("../src/view");
+    Component = require("../src/Component"),
+    View = require("../src/View");
 
 test("View.create", function(t) {
 

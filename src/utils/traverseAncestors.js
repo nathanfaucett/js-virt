@@ -1,4 +1,4 @@
-var traversePath = require("./traverse_path");
+var traversePath = require("./traversePath");
 
 
 module.exports = traverseAncestors;

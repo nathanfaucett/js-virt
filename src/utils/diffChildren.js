@@ -1,7 +1,7 @@
 var isNullOrUndefined = require("is_null_or_undefined"),
-    getChildKey = require("./utils/get_child_key"),
-    shouldUpdate = require("./utils/should_update"),
-    View = require("./view"),
+    getChildKey = require("./getChildKey"),
+    shouldUpdate = require("./shouldUpdate"),
+    View = require("../View"),
     Node;
 
 
@@ -11,7 +11,7 @@ var isPrimitiveView = View.isPrimitiveView;
 module.exports = diffChildren;
 
 
-Node = require("./node");
+Node = require("../Node");
 
 
 function diffChildren(node, previous, next, transaction) {

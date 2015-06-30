@@ -1,4 +1,4 @@
-var isBoundary = require("./is_boundary");
+var isBoundary = require("./isBoundary");
 
 
 module.exports = isAncestorIdOf;

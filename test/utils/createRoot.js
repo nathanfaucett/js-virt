@@ -1,4 +1,4 @@
-var Root = require("../../src/root");
+var Root = require("../../src/Root");
 
 
 module.exports = createRoot;

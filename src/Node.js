@@ -8,13 +8,12 @@ var has = require("has"),
     mixin = require("mixin"),
     owner = require("./owner"),
     context = require("./context"),
-    shouldUpdate = require("./utils/should_update"),
-    componentState = require("./utils/component_state"),
-    getComponentClassForType = require("./utils/get_component_class_for_type"),
-    View = require("./view"),
-    getChildKey = require("./utils/get_child_key"),
-    emptyObject = require("./utils/empty_object"),
-    diffProps = require("./diff_props"),
+    shouldUpdate = require("./utils/shouldUpdate"),
+    componentState = require("./utils/componentState"),
+    getComponentClassForType = require("./utils/getComponentClassForType"),
+    View = require("./View"),
+    getChildKey = require("./utils/getChildKey"),
+    emptyObject = require("./utils/emptyObject"),
     diffChildren;
 
 
@@ -23,6 +22,9 @@ var NodePrototype,
 
 
 module.exports = Node;
+
+
+diffChildren = require("./utils/diffChildren");
 
 
 function Node(parentId, id, currentView) {
@@ -322,12 +324,11 @@ NodePrototype.__updateRenderedNode = function(context, transaction) {
     this.__attachRefs();
 };
 
-diffChildren = require("./diff_children");
-
 NodePrototype.__updateRenderedView = function(prevRenderedView, context, transaction) {
     var id = this.id,
+        root = this.root,
         nextRenderedView = this.renderView(),
-        propsDiff = diffProps(id, this.root.eventManager, transaction, prevRenderedView.props, nextRenderedView.props);
+        propsDiff = root.diffProps(id, root.eventManager, transaction, prevRenderedView.props, nextRenderedView.props);
 
     if (propsDiff !== null) {
         transaction.props(id, prevRenderedView.props, propsDiff);

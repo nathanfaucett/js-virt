@@ -1,4 +1,4 @@
-var Component = require("../../src/component");
+var Component = require("../../src/Component");
 
 module.exports = createComponent;
 
