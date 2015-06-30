@@ -1,8 +1,10 @@
-var emptyFunction = require("empty_function"),
+var extend = require("extend"),
     isFunction = require("is_function"),
+    emptyFunction = require("empty_function"),
     Transaction = require("./Transaction"),
     diffProps = require("./utils/diffProps"),
     shouldUpdate = require("./utils/shouldUpdate"),
+    nativeComponents = require("./utils/nativeComponents"),
     EventManager = require("./EventManager"),
     Node = require("./Node");
 
@@ -21,6 +23,7 @@ function Root() {
 
     this.eventManager = new EventManager();
 
+    this.nativeComponents = extend({}, nativeComponents);
     this.diffProps = diffProps;
     this.adapter = null;
 
@@ -29,6 +32,10 @@ function Root() {
     this.__currentTransaction = null;
 }
 RootPrototype = Root.prototype;
+
+RootPrototype.registerNativeComponent = function(type, constructor) {
+    this.nativeComponents[type] = constructor;
+};
 
 RootPrototype.appendNode = function(node) {
     var id = node.id,

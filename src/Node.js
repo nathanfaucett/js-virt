@@ -78,7 +78,7 @@ NodePrototype.mountComponent = function() {
     if (isFunction(currentView.type)) {
         ComponentClass = currentView.type;
     } else {
-        ComponentClass = getComponentClassForType(currentView.type);
+        ComponentClass = getComponentClassForType(this.root.nativeComponents, currentView.type);
         this.isTopLevel = true;
     }
 

@@ -1,17 +1,18 @@
 var nativeComponents = require("./nativeComponents"),
-    registerNativeComponent = require("./registerNativeComponent"),
     createNativeComponentForType = require("./createNativeComponentForType");
 
 
 module.exports = getComponentClassForType;
 
 
-function getComponentClassForType(type) {
-    var Class = nativeComponents[type];
+function getComponentClassForType(rootNativeComponents, type) {
+    var Class = rootNativeComponents[type] || nativeComponents[type];
 
     if (Class) {
         return Class;
     } else {
-        return registerNativeComponent(type, createNativeComponentForType(type));
+        Class = createNativeComponentForType(type);
+        rootNativeComponents[type] = nativeComponents[type] = Class;
+        return Class;
     }
 }
