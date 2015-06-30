@@ -54,7 +54,7 @@ function diffProps(id, eventManager, transaction, previous, next) {
             result[key] = nextValue;
 
             if (localHas(propNameToTopLevel, key)) {
-                eventManager.on(id, propNameToTopLevel[key], transaction);
+                eventManager.on(id, propNameToTopLevel[key], nextValue, transaction);
             }
         }
     }

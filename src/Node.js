@@ -37,6 +37,7 @@ function Node(parentId, id, currentView) {
 
     this.root = null;
 
+    this.ComponentClass = null;
     this.component = null;
 
     this.isBottomLevel = true;
@@ -76,9 +77,9 @@ NodePrototype.mountComponent = function() {
         ComponentClass, component, props, children, context;
 
     if (isFunction(currentView.type)) {
-        ComponentClass = currentView.type;
+        this.ComponentClass = ComponentClass = currentView.type;
     } else {
-        ComponentClass = getComponentClassForType(this.root.nativeComponents, currentView.type);
+        this.ComponentClass = ComponentClass = getComponentClassForType(this.root.nativeComponents, currentView.type);
         this.isTopLevel = true;
     }
 
@@ -388,15 +389,15 @@ NodePrototype.__checkTypes = function(propTypes, props) {
 };
 
 NodePrototype.__processProps = function(props) {
-    var type = this.currentView.type,
+    var ComponentClass = this.ComponentClass,
         propTypes;
 
-    if (type.getDefaultProps) {
-        props = mixin({}, props, type.getDefaultProps());
+    if (ComponentClass.getDefaultProps) {
+        props = mixin({}, props, ComponentClass.getDefaultProps());
     }
 
     if (process.env.NODE_ENV !== "production") {
-        propTypes = type.propTypes;
+        propTypes = ComponentClass.propTypes;
 
         if (propTypes) {
             this.__checkTypes(propTypes, props);
@@ -410,10 +411,10 @@ NodePrototype.__maskContext = function(context) {
     var maskedContext = null,
         contextTypes, contextName, localHas;
 
-    if (isString(this.currentView.type)) {
+    if (isString(this.ComponentClass)) {
         return emptyObject;
     } else {
-        contextTypes = this.currentView.type.contextTypes;
+        contextTypes = this.ComponentClass.contextTypes;
 
         if (contextTypes) {
             maskedContext = {};
@@ -435,7 +436,7 @@ NodePrototype.__processContext = function(context) {
         contextTypes;
 
     if (process.env.NODE_ENV !== "production") {
-        contextTypes = this.currentView.type.contextTypes;
+        contextTypes = this.ComponentClass.contextTypes;
 
         if (contextTypes) {
             this.__checkTypes(contextTypes, maskedContext);
@@ -451,7 +452,7 @@ NodePrototype.__processChildContext = function(currentContext) {
         childContextTypes, localHas, contextName, displayName;
 
     if (childContext) {
-        childContextTypes = this.currentView.type.childContextTypes;
+        childContextTypes = this.ComponentClass.childContextTypes;
 
         if (process.env.NODE_ENV !== "production") {
             if (childContextTypes) {
