@@ -63,26 +63,8 @@ View.clone = function(view, config, children) {
         key = view.key,
         ref = view.ref,
         viewOwner = view.__owner,
-
-        isConfigArray = isArray(config),
-        argumentsLength = arguments.length,
-
-        propName;
-
-    if (isChild(config) || isConfigArray) {
-        if (isConfigArray) {
-            children = config;
-        } else if (argumentsLength > 1) {
-            children = extractChildren(arguments, 1);
-        }
-        config = null;
-    } else if (children) {
-        if (isArray(children)) {
-            children = children;
-        } else if (argumentsLength > 2) {
-            children = extractChildren(arguments, 2);
-        }
-    }
+        childrenLength = arguments.length - 2,
+        propName, childArray, i, il;
 
     if (config) {
         if (config.ref) {
@@ -102,7 +84,21 @@ View.clone = function(view, config, children) {
         }
     }
 
-    return new View(view.type, key, ref, props, children, viewOwner, context.current);
+    if (childrenLength === 1 && !isArray(children)) {
+        children = [children];
+    } else if (childrenLength > 1) {
+        childArray = new Array(childrenLength);
+        i = -1;
+        il = childrenLength - 1;
+        while (i++ < il) {
+            childArray[i] = arguments[i + 2];
+        }
+        children = childArray;
+    } else {
+        children = view.children;
+    }
+
+    return new View(view.type, key, ref, props, ensureValidChildren(children), viewOwner, context.current);
 };
 
 View.create = function(type, config, children) {
