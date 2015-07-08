@@ -17,8 +17,6 @@ virt.consts = require("./Transaction/consts");
 
 virt.getChildKey = require("./utils/getChildKey");
 
-virt.registerNativeComponent = require("./utils/registerNativeComponent");
-
 virt.traverseAncestors = require("./utils/traverseAncestors");
 virt.traverseDescendants = require("./utils/traverseDescendants");
 virt.traverseTwoPhase = require("./utils/traverseTwoPhase");

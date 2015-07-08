@@ -1,10 +1,8 @@
-var extend = require("extend"),
-    isFunction = require("is_function"),
+var isFunction = require("is_function"),
     emptyFunction = require("empty_function"),
     Transaction = require("./Transaction"),
     diffProps = require("./utils/diffProps"),
     shouldUpdate = require("./utils/shouldUpdate"),
-    nativeComponents = require("./utils/nativeComponents"),
     EventManager = require("./EventManager"),
     Node = require("./Node");
 
@@ -23,7 +21,7 @@ function Root() {
 
     this.eventManager = new EventManager();
 
-    this.nativeComponents = extend({}, nativeComponents);
+    this.nativeComponents = {};
     this.diffProps = diffProps;
     this.adapter = null;
 
