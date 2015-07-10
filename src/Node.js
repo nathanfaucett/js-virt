@@ -5,7 +5,6 @@ var has = require("has"),
     isArray = require("is_array"),
     isFunction = require("is_function"),
     extend = require("extend"),
-    mixin = require("mixin"),
     owner = require("./owner"),
     context = require("./context"),
     shouldUpdate = require("./utils/shouldUpdate"),
@@ -391,10 +390,6 @@ NodePrototype.__checkTypes = function(propTypes, props) {
 NodePrototype.__processProps = function(props) {
     var ComponentClass = this.ComponentClass,
         propTypes;
-
-    if (ComponentClass.getDefaultProps) {
-        props = mixin({}, props, ComponentClass.getDefaultProps());
-    }
 
     if (process.env.NODE_ENV !== "production") {
         propTypes = ComponentClass.propTypes;
