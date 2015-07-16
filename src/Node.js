@@ -505,12 +505,9 @@ NodePrototype.__getName = function() {
 };
 
 function attachRef(component, ref, owner) {
-    var refs;
-
     if (isString(ref)) {
         if (owner) {
-            refs = owner.refs === emptyObject ? (owner.refs = {}) : owner.refs;
-            refs[ref] = component;
+            owner.refs[ref] = component;
         } else {
             throw new Error("cannot add ref to view without owner");
         }

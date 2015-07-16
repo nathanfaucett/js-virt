@@ -1,7 +1,6 @@
 var inherits = require("inherits"),
     extend = require("extend"),
-    componentState = require("./utils/componentState"),
-    emptyObject = require("./utils/emptyObject");
+    componentState = require("./utils/componentState");
 
 
 var ComponentPrototype;
@@ -18,7 +17,7 @@ function Component(props, children, context) {
     this.children = children;
     this.context = context;
     this.state = null;
-    this.refs = emptyObject;
+    this.refs = {};
 }
 
 ComponentPrototype = Component.prototype;

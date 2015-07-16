@@ -96,7 +96,7 @@ RootPrototype.__enqueueTransaction = function(transaction, callback) {
     this.__processTransaction();
 };
 
-RootPrototype.unmount = function() {
+RootPrototype.unmount = function(callback) {
     var node = this.childHash[this.id],
         transaction;
 
@@ -106,7 +106,7 @@ RootPrototype.unmount = function() {
         transaction.unmount(this.id);
         node.__unmount(transaction);
 
-        this.__enqueueTransaction(transaction, emptyFunction);
+        this.__enqueueTransaction(transaction, callback);
     }
 };
 
