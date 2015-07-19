@@ -61,8 +61,10 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
             if (isNullOrUndefined(nextChild)) {
                 id = getChildKey(parentId, previousChild, index);
                 node = root.childHash[id];
-                node.unmount(transaction);
-                parentNode.removeNode(node);
+                if (node) {
+                    node.unmount(transaction);
+                    parentNode.removeNode(node);
+                }
             } else if (isPrimitiveView(nextChild)) {
                 transaction.replace(parentId, null, index, nextChild);
             } else {
