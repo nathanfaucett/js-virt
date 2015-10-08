@@ -16,6 +16,7 @@ virt.createFactory = View.createFactory;
 virt.consts = require("./Transaction/consts");
 
 virt.getChildKey = require("./utils/getChildKey");
+virt.getRootIdFromId = require("./utils/getRootIdFromId");
 
 virt.traverseAncestors = require("./utils/traverseAncestors");
 virt.traverseDescendants = require("./utils/traverseDescendants");

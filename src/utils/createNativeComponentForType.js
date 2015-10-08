@@ -6,6 +6,7 @@ module.exports = createNativeComponentForType;
 
 
 function createNativeComponentForType(type) {
+
     function NativeComponent(props, children) {
         Component.call(this, props, children);
     }
