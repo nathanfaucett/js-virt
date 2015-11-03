@@ -1,6 +1,7 @@
 var has = require("has"),
     map = require("map"),
     indexOf = require("index_of"),
+    isNull = require("is_null"),
     isString = require("is_string"),
     isArray = require("is_array"),
     isFunction = require("is_function"),
@@ -330,7 +331,7 @@ NodePrototype.__updateRenderedView = function(prevRenderedView, context, transac
         nextRenderedView = this.renderView(),
         propsDiff = root.diffProps(id, root.eventManager, transaction, prevRenderedView.props, nextRenderedView.props);
 
-    if (propsDiff !== null) {
+    if (!isNull(propsDiff)) {
         transaction.props(id, prevRenderedView.props, propsDiff);
     }
 

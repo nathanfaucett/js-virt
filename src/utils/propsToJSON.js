@@ -1,4 +1,5 @@
 var has = require("has"),
+    isNull = require("is_null"),
     isPrimitive = require("is_primitive");
 
 
@@ -10,19 +11,20 @@ function propsToJSON(props) {
 }
 
 function toJSON(props, json) {
-    var key, value;
+    var localHas = has,
+        key, value;
 
     for (key in props) {
-        if (has(props, key)) {
+        if (localHas(props, key)) {
             value = props[key];
 
             if (isPrimitive(value)) {
-                json = json === null ? {} : json;
+                json = isNull(json) ? {} : json;
                 json[key] = value;
             } else {
                 value = toJSON(value, null);
-                if (value !== null) {
-                    json = json === null ? {} : json;
+                if (!isNull(value)) {
+                    json = isNull(json) ? {} : json;
                     json[key] = value;
                 }
             }

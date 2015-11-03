@@ -1,6 +1,7 @@
 var has = require("has"),
     isObject = require("is_object"),
     getPrototypeOf = require("get_prototype_of"),
+    isNull = require("is_null"),
     isNullOrUndefined = require("is_null_or_undefined");
 
 
@@ -34,7 +35,7 @@ function diffProps(id, eventManager, transaction, previous, next) {
                     result[key] = nextValue;
                 } else {
                     propsDiff = diffProps(id, eventManager, transaction, previousValue, nextValue);
-                    if (propsDiff !== null) {
+                    if (!isNull(propsDiff)) {
                         result = result || {};
                         result[key] = propsDiff;
                     }

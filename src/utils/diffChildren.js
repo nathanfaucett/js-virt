@@ -1,4 +1,6 @@
-var isNullOrUndefined = require("is_null_or_undefined"),
+var isNull = require("is_null"),
+    isUndefined = require("is_undefined"),
+    isNullOrUndefined = require("is_null_or_undefined"),
     getChildKey = require("./getChildKey"),
     shouldUpdate = require("./shouldUpdate"),
     View = require("../View"),
@@ -99,12 +101,12 @@ function reorder(previousChildren, nextChildren) {
         length, shuffle, freeIndex, i, moveIndex, moves, removes, reverse, hasMoves, move, freeChild;
 
     nextKeys = keyIndex(nextChildren);
-    if (nextKeys === null) {
+    if (isNull(nextKeys)) {
         return nextChildren;
     }
 
     previousKeys = keyIndex(previousChildren);
-    if (previousKeys === null) {
+    if (isNull(previousKeys)) {
         return nextChildren;
     }
 
@@ -134,7 +136,7 @@ function reorder(previousChildren, nextChildren) {
     while (freeIndex < length) {
         move = previousMatch[i];
 
-        if (move !== undefined) {
+        if (!isUndefined(move)) {
             shuffle[i] = nextChildren[move];
 
             if (move !== moveIndex) {
@@ -145,11 +147,11 @@ function reorder(previousChildren, nextChildren) {
 
             moveIndex++;
         } else if (i in previousMatch) {
-            shuffle[i] = undefined;
+            shuffle[i] = void(0);
             removes[i] = moveIndex++;
             hasMoves = true;
         } else {
-            while (nextMatch[freeIndex] !== undefined) {
+            while (!isUndefined(nextMatch[freeIndex])) {
                 freeIndex++;
             }
 

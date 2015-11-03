@@ -1,4 +1,5 @@
 var isFunction = require("is_function"),
+    isNull = require("is_null"),
     emptyFunction = require("empty_function"),
     Transaction = require("./Transaction"),
     diffProps = require("./utils/diffProps"),
@@ -65,7 +66,7 @@ RootPrototype.__processTransaction = function() {
         transactionCallbacks = this.__transactionCallbacks,
         transaction, callback;
 
-    if (this.__currentTransaction === null && transactions.length !== 0) {
+    if (isNull(this.__currentTransaction) && transactions.length !== 0) {
         this.__currentTransaction = transaction = transactions[0];
         callback = transactionCallbacks[0];
 

@@ -59,7 +59,8 @@ View.isViewJSON = isViewJSON;
 View.toJSON = toJSON;
 
 View.clone = function(view, config, children) {
-    var props = extend({}, view.props),
+    var localHas = has,
+        props = extend({}, view.props),
         key = view.key,
         ref = view.ref,
         viewOwner = view.__owner,
@@ -76,7 +77,7 @@ View.clone = function(view, config, children) {
         }
 
         for (propName in config) {
-            if (has(config, propName)) {
+            if (localHas(config, propName)) {
                 if (!(propName === "key" || propName === "ref")) {
                     props[propName] = config[propName];
                 }
@@ -148,7 +149,8 @@ View.createFactory = function(type) {
 };
 
 function construct(type, config, children) {
-    var props = {},
+    var localHas = has,
+        props = {},
         key = null,
         ref = null,
         propName, defaultProps;
@@ -158,7 +160,7 @@ function construct(type, config, children) {
         ref = config.ref != null ? config.ref : null;
 
         for (propName in config) {
-            if (has(config, propName)) {
+            if (localHas(config, propName)) {
                 if (!(propName === "key" || propName === "ref")) {
                     props[propName] = config[propName];
                 }
@@ -170,7 +172,7 @@ function construct(type, config, children) {
         defaultProps = type.defaultProps;
 
         for (propName in defaultProps) {
-            if (has(defaultProps, propName)) {
+            if (localHas(defaultProps, propName)) {
                 if (isNullOrUndefined(props[propName])) {
                     props[propName] = defaultProps[propName];
                 }
