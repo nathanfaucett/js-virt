@@ -6,7 +6,7 @@ var isPrimitive = require("is_primitive"),
     isNullOrUndefined = require("is_null_or_undefined"),
     isNumber = require("is_number"),
     has = require("has"),
-    map = require("map"),
+    arrayMap = require("array-map"),
     extend = require("extend"),
     propsToJSON = require("./utils/propsToJSON"),
     owner = require("./owner"),
@@ -28,7 +28,6 @@ function View(type, key, ref, props, children, owner, context) {
     this.props = props;
     this.children = children;
 }
-
 ViewPrototype = View.prototype;
 
 ViewPrototype.__View__ = true;
@@ -192,7 +191,7 @@ function toJSON(view) {
             key: view.key,
             ref: view.ref,
             props: propsToJSON(view.props),
-            children: map(view.children, toJSON)
+            children: arrayMap(view.children, toJSON)
         };
     }
 }

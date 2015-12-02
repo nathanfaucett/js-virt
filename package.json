@@ -29,6 +29,7 @@
     "zuul": "^3.7.2"
   },
   "dependencies": {
+    "array-map": "git://github.com/nathanfaucett/array-map.git",
     "create_pool": "git://github.com/nathanfaucett/create_pool.git",
     "empty_function": "git://github.com/nathanfaucett/empty_function.git",
     "extend": "git://github.com/nathanfaucett/extend.git",
@@ -39,15 +40,14 @@
     "is_array": "git://github.com/nathanfaucett/is_array.git",
     "is_function": "git://github.com/nathanfaucett/is_function.git",
     "is_null": "git://github.com/nathanfaucett/is_null.git",
-    "is_undefined": "git://github.com/nathanfaucett/is_undefined.git",
     "is_null_or_undefined": "git://github.com/nathanfaucett/is_null_or_undefined.git",
     "is_number": "git://github.com/nathanfaucett/is_number.git",
     "is_object": "git://github.com/nathanfaucett/is_object.git",
     "is_object_like": "git://github.com/nathanfaucett/is_object_like.git",
     "is_primitive": "git://github.com/nathanfaucett/is_primitive.git",
     "is_string": "git://github.com/nathanfaucett/is_string.git",
+    "is_undefined": "git://github.com/nathanfaucett/is_undefined.git",
     "key_mirror": "git://github.com/nathanfaucett/key_mirror.git",
-    "map": "git://github.com/nathanfaucett/map.git",
     "queue": "git://github.com/nathanfaucett/queue.git"
   }
 }

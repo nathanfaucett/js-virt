@@ -1,5 +1,5 @@
 var has = require("has"),
-    map = require("map"),
+    arrayMap = require("array-map"),
     indexOf = require("index_of"),
     isNull = require("is_null"),
     isString = require("is_string"),
@@ -142,7 +142,7 @@ NodePrototype.__mountChildren = function(renderedView, transaction) {
 
     this.renderedChildren = renderedChildren;
 
-    renderedView.children = map(renderedView.children, function(child, index) {
+    renderedView.children = arrayMap(renderedView.children, function(child, index) {
         var node, id;
 
         if (isPrimitiveView(child)) {
