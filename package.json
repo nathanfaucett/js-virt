@@ -24,6 +24,8 @@
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.11.3",
     "grunt-jsbeautifier": "^0.2.10",
+    "messenger": "git://github.com/nathanfaucett/messenger.git",
+    "messenger_adapter": "git://github.com/nathanfaucett/messenger_adapter.git",
     "tap-spec": "^4.1.0",
     "tape": "^4.2.2",
     "zuul": "^3.7.2"

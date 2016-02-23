@@ -1,5 +1,6 @@
 var isFunction = require("is_function"),
     isNull = require("is_null"),
+    isUndefined = require("is_undefined"),
     emptyFunction = require("empty_function"),
     Transaction = require("./Transaction"),
     diffProps = require("./utils/diffProps"),
@@ -40,7 +41,7 @@ RootPrototype.appendNode = function(node) {
     var id = node.id,
         childHash = this.childHash;
 
-    if (childHash[id] === undefined) {
+    if (isUndefined(childHash[id])) {
         node.root = this;
         childHash[id] = node;
     } else {
@@ -52,7 +53,7 @@ RootPrototype.removeNode = function(node) {
     var id = node.id,
         childHash = this.childHash;
 
-    if (childHash[id] !== undefined) {
+    if (!isUndefined(childHash[id])) {
         node.root = null;
         delete childHash[id];
     } else {
@@ -70,7 +71,7 @@ RootPrototype.__processTransaction = function() {
         this.__currentTransaction = transaction = transactions[0];
         callback = transactionCallbacks[0];
 
-        this.adapter.handle(transaction, function onHandle() {
+        this.adapter.messenger.emit("virt.handleTransaction", transaction, function onHandleTransaction() {
             transactions.splice(0, 1);
             transactionCallbacks.splice(0, 1);
 

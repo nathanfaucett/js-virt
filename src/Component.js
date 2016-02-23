@@ -74,6 +74,24 @@ ComponentPrototype.offMessage = function(name, callback) {
     this.__node.root.adapter.messenger.off(name, callback);
 };
 
+ComponentPrototype.onGlobalEvent = function(name, listener, callback) {
+    var root = this.__node.root,
+        eventManager = root.eventManager,
+        topLevelType = eventManager.propNameToTopLevel[name];
+
+    eventManager.globalOn(topLevelType, listener);
+    this.emitMessage("virt.onGlobalEvent", topLevelType, callback);
+};
+
+ComponentPrototype.offGlobalEvent = function(name, listener, callback) {
+    var root = this.__node.root,
+        eventManager = root.eventManager,
+        topLevelType = eventManager.propNameToTopLevel[name];
+
+    eventManager.globalOff(topLevelType, callback);
+    this.emitMessage("virt.offGlobalEvent", topLevelType, callback);
+};
+
 ComponentPrototype.getChildContext = function() {};
 
 ComponentPrototype.componentDidMount = function() {};
