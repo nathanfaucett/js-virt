@@ -142,7 +142,7 @@ NodePrototype.__mountChildren = function(renderedView, transaction) {
 
     this.renderedChildren = renderedChildren;
 
-    renderedView.children = arrayMap(renderedView.children, function(child, index) {
+    renderedView.children = arrayMap(renderedView.children, function renderChild(child, index) {
         var node, id;
 
         if (isPrimitiveView(child)) {
