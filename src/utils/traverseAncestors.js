@@ -5,5 +5,5 @@ module.exports = traverseAncestors;
 
 
 function traverseAncestors(id, callback) {
-    traversePath("", id, callback, true, false);
+    traversePath(id, "", callback, false, true);
 }
