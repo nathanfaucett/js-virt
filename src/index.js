@@ -18,7 +18,8 @@ virt.consts = require("./Transaction/consts");
 virt.getChildKey = require("./utils/getChildKey");
 virt.getRootIdFromId = require("./utils/getRootIdFromId");
 
-virt.traverseAncestors = require("./utils/traverseAncestors");
+virt.isAncestorIdOf = require("./utils/isAncestorIdOf"),
+    virt.traverseAncestors = require("./utils/traverseAncestors");
 virt.traverseDescendants = require("./utils/traverseDescendants");
 virt.traverseTwoPhase = require("./utils/traverseTwoPhase");
 
