@@ -5,7 +5,6 @@ module.exports = keyMirror([
     "MOUNTING",
     "MOUNTED",
     "UPDATING",
-    "UPDATED",
     "UNMOUNTING",
     "UNMOUNTED"
 ]);

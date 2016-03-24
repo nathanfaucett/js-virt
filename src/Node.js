@@ -296,11 +296,10 @@ NodePrototype.__updateComponent = function(
     }
 
     transaction.queue.enqueue(function onUpdate() {
-        component.__mountState = componentState.UPDATED;
+        component.__mountState = componentState.MOUNTED;
         if (component.componentDidUpdate) {
             component.componentDidUpdate(prevProps, prevChildren, prevState, prevContext);
         }
-        component.__mountState = componentState.MOUNTED;
     });
 };
 
