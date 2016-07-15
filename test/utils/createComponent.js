@@ -1,5 +1,6 @@
 var Component = require("../../src/Component");
 
+
 module.exports = createComponent;
 
 

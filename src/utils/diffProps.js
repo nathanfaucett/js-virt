@@ -1,8 +1,8 @@
-var has = require("has"),
-    isObject = require("is_object"),
-    getPrototypeOf = require("get_prototype_of"),
-    isNull = require("is_null"),
-    isNullOrUndefined = require("is_null_or_undefined");
+var has = require("@nathanfaucett/has"),
+    isObject = require("@nathanfaucett/is_object"),
+    getPrototypeOf = require("@nathanfaucett/get_prototype_of"),
+    isNull = require("@nathanfaucett/is_null"),
+    isNullOrUndefined = require("@nathanfaucett/is_null_or_undefined");
 
 
 module.exports = diffProps;

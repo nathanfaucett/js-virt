@@ -1,4 +1,4 @@
-var keyMirror = require("key_mirror");
+var keyMirror = require("@nathanfaucett/key_mirror");
 
 
 module.exports = keyMirror([

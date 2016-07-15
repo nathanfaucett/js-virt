@@ -1,6 +1,6 @@
-var has = require("has"),
-    isNull = require("is_null"),
-    isPrimitive = require("is_primitive");
+var has = require("@nathanfaucett/has"),
+    isNull = require("@nathanfaucett/is_null"),
+    isPrimitive = require("@nathanfaucett/is_primitive");
 
 
 module.exports = propsToJSON;

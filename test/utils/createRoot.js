@@ -1,5 +1,5 @@
-var Messenger = require("messenger"),
-    createMessengerAdapter = require("messenger_adapter"),
+var Messenger = require("@nathanfaucett/messenger"),
+    createMessengerAdapter = require("@nathanfaucett/messenger_adapter"),
     Root = require("../../src/Root");
 
 

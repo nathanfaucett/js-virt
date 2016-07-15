@@ -1,4 +1,4 @@
-var createPool = require("create_pool"),
+var createPool = require("@nathanfaucett/create_pool"),
     propsToJSON = require("../utils/propsToJSON"),
     consts = require("./consts");
 

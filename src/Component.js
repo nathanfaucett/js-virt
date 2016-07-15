@@ -1,5 +1,5 @@
-var inherits = require("inherits"),
-    extend = require("extend"),
+var inherits = require("@nathanfaucett/inherits"),
+    extend = require("@nathanfaucett/extend"),
     componentState = require("./utils/componentState");
 
 

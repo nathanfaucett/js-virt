@@ -1,4 +1,4 @@
-var createPool = require("create_pool"),
+var createPool = require("@nathanfaucett/create_pool"),
     consts = require("./consts");
 
 

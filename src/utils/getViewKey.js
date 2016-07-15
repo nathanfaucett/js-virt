@@ -1,4 +1,4 @@
-var isNullOrUndefined = require("is_null_or_undefined");
+var isNullOrUndefined = require("@nathanfaucett/is_null_or_undefined");
 
 
 var reEscape = /[=.:]/g;

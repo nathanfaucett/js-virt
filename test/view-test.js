@@ -1,5 +1,5 @@
 var test = require("tape"),
-    isFunction = require("is_function"),
+    isFunction = require("@nathanfaucett/is_function"),
     Component = require("../src/Component"),
     View = require("../src/View");
 

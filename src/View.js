@@ -1,13 +1,13 @@
-var isPrimitive = require("is_primitive"),
-    isFunction = require("is_function"),
-    isArray = require("is_array"),
-    isString = require("is_string"),
-    isObjectLike = require("is_object_like"),
-    isNullOrUndefined = require("is_null_or_undefined"),
-    isNumber = require("is_number"),
-    has = require("has"),
-    arrayMap = require("array-map"),
-    extend = require("extend"),
+var isPrimitive = require("@nathanfaucett/is_primitive"),
+    isFunction = require("@nathanfaucett/is_function"),
+    isArray = require("@nathanfaucett/is_array"),
+    isString = require("@nathanfaucett/is_string"),
+    isObject = require("@nathanfaucett/is_object"),
+    isNullOrUndefined = require("@nathanfaucett/is_null_or_undefined"),
+    isNumber = require("@nathanfaucett/is_number"),
+    has = require("@nathanfaucett/has"),
+    arrayMap = require("@nathanfaucett/array-map"),
+    extend = require("@nathanfaucett/extend"),
     propsToJSON = require("./utils/propsToJSON"),
     owner = require("./owner"),
     context = require("./context");
@@ -197,7 +197,7 @@ function toJSON(view) {
 }
 
 function isView(obj) {
-    return isObjectLike(obj) && obj.__View__ === true;
+    return isObject(obj) && obj.__View__ === true;
 }
 
 function isViewComponent(obj) {
@@ -206,9 +206,9 @@ function isViewComponent(obj) {
 
 function isViewJSON(obj) {
     return (
-        isObjectLike(obj) &&
+        isObject(obj) &&
         isString(obj.type) &&
-        isObjectLike(obj.props) &&
+        isObject(obj.props) &&
         isArray(obj.children)
     );
 }

@@ -1,5 +1,5 @@
-var indexOf = require("index_of"),
-    isUndefined = require("is_undefined");
+var indexOf = require("@nathanfaucett/index_of"),
+    isUndefined = require("@nathanfaucett/is_undefined");
 
 
 var EventManagerPrototype;
