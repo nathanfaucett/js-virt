@@ -1,7 +1,7 @@
 virt
 ======
 
-virt is a tool for creating interactive UIs. Use views for each state in your application, and virt will find the differences and create a JSON object of the changes.
+A tool for creating interactive UIs. Use views for each state in your application, and virt will find the differences and create a JSON object of the changes.
 
 use of a renderer for the JSON is nesseecary the only one aviable right now is [virt-dom](https://github.com/nathanfaucett/virt-dom)
 

@@ -1,7 +1,7 @@
 {
   "name": "@nathanfaucett/virt",
   "version": "0.0.1",
-  "description": "virt for the browser and node.js",
+  "description": "A tool for creating interactive UIs",
   "repository": {
     "type": "git",
     "url": "https://github.com/nathanfaucett/virt.git"
