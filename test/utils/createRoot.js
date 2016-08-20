@@ -15,6 +15,7 @@ function createRoot(beforeCleanUp, afterCleanUp) {
         messengerClient = new Messenger(socket.client),
         messengerServer = new Messenger(socket.server);
 
+
     root.adapter = {
         messenger: messengerServer,
         messengerClient: messengerClient

@@ -259,6 +259,7 @@ NodePrototype.updateComponent = function(
         component.state = nextState;
         component.context = nextContext;
 
+        component.__nextState = null;
         component.__mountState = componentState.MOUNTED;
     }
 };
@@ -283,6 +284,8 @@ NodePrototype.__updateComponent = function(
     component.children = nextChildren;
     component.state = nextState;
     component.context = nextContext;
+
+    component.__nextState = null;
 
     this.context = unmaskedContext;
 

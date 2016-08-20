@@ -4,50 +4,50 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-test("event", function(t) {
+test("event", function(assert) {
     var hits = 0;
 
-    var root = createRoot(function(transaction) {
-        var patch;
+    var root = createRoot(
+        function beforeCleanUp(transaction) {
+            var patch;
 
-        hits++;
+            hits++;
 
-        if (hits === 2) {
-            patch = transaction.patches[root.id][0];
+            if (hits === 2) {
+                patch = transaction.patches[root.id][0];
 
-            var incomingEvent = root.eventManager.events.topEvent[root.id];
+                assert.equal(patch.type, "TEXT", "text patch after update");
+                assert.equal(patch.next, "foo", "accepts foo on componentDidMount");
+            }
 
-            t.equal(patch.type, "TEXT", "text patch after update");
-            t.equal(patch.next, "foo", "accepts foo on componentDidMount");
+            if (hits === 3) {
+                patch = transaction.patches[root.id][0];
 
-            // todo: fixme component state is UPDATING if we
-            // don't use setTimeout
-            setTimeout(function() {
-                incomingEvent({
+                assert.equal(patch.type, "TEXT", "text text after event causes state update");
+                assert.equal(patch.next, "bar", "accepts bar from setState");
+
+                assert.end();
+            }
+
+        },
+        function afterCleanUp() {
+            var event;
+
+            if (hits === 2) {
+                event = root.eventManager.events.topEvent[root.id];
+
+                event({
                     data: "bar"
                 });
-            }, 100);
-
-
+            }
         }
-
-        if (hits === 3) {
-            patch = transaction.patches[root.id][0];
-
-            t.equal(patch.type, "TEXT", "text text after event causes state update");
-            t.equal(patch.next, "bar", "accepts bar from setState");
-
-            t.end();
-        }
-
-    });
+    );
 
     var Component = createComponent({
         text: "default"
     });
 
     Component.prototype.render = function() {
-
         var _this = this;
 
         return (
@@ -69,5 +69,4 @@ test("event", function(t) {
     };
 
     root.render(View.create(Component));
-
 });

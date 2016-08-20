@@ -4,21 +4,21 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-test("transaction triggers insert patch", function(t) {
+test("transaction triggers insert patch", function(assert) {
 
     var hits = 0;
-    var root = createRoot(function(transaction) {
+    var root = createRoot(function beforeCleanUp(transaction) {
+        var patches = transaction.patches,
+            patch;
 
         hits++;
 
-        var patches = transaction.patches;
-
         if (hits === 2) {
-            var patch = patches[root.id][0];
+            patch = patches[root.id][0];
 
-            t.equal(patch.id, root.id, "patch id should be on root");
-            t.equal(patch.type, "REPLACE", "state change for text triggers REPLACE patch");
-            t.deepEqual(patch.next, {
+            assert.equal(patch.id, root.id, "patch id should be on root");
+            assert.equal(patch.type, "REPLACE", "state change for text triggers REPLACE patch");
+            assert.deepEqual(patch.next, {
                 __owner: null,
                 __context: null,
                 type: "p",
@@ -28,7 +28,7 @@ test("transaction triggers insert patch", function(t) {
                 children: ["p-tag"]
             }, "takes in next replace patch");
 
-            t.end();
+            assert.end();
         }
 
     });

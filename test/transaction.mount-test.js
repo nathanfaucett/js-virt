@@ -7,7 +7,7 @@ function emptyFunction() {}
 
 
 test("transaction mount", function(assert) {
-    var root = createRoot(function(transaction) {
+    var root = createRoot(function beforeCleanUp(transaction) {
         var patch = transaction.patches[root.id][0];
 
         assert.equal(patch.type, "MOUNT", "type should be MOUNT");

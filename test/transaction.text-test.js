@@ -4,23 +4,23 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-test("transaction triggers text patch", function(t) {
-
+test("transaction triggers text patch", function(assert) {
     var hits = 0;
-    var root = createRoot(function(transaction) {
+
+    var root = createRoot(function beforeCleanUp(transaction) {
+        var patches = transaction.patches,
+            patch;
 
         hits++;
 
-        var patches = transaction.patches;
-
         if (hits === 2) {
-            var patch = patches[root.id + ".0"][0];
+            patch = patches[root.id + ".0"][0];
 
-            t.equal(patch.id, root.id + ".0", "patch id should be first child of root");
-            t.equal(patch.type, "TEXT", "state change for text triggers TEXT patch");
-            t.equal(patch.next, "bar", "takes in next text patch");
+            assert.equal(patch.id, root.id + ".0", "patch id should be first child of root");
+            assert.equal(patch.type, "TEXT", "state change for text triggers TEXT patch");
+            assert.equal(patch.next, "bar", "takes in next text patch");
 
-            t.end();
+            assert.end();
         }
 
     });

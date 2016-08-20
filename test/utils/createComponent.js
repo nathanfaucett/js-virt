@@ -6,13 +6,14 @@ module.exports = createComponent;
 
 function createComponent(state) {
 
-    var tc = function __test_component__(props, children, context) {
+    function TestComponent(props, children, context) {
+
         Component.call(this, props, children, context);
 
         this.state = state || {};
-    };
+    }
 
-    Component.extend(tc, "__test_component__");
+    Component.extend(TestComponent, "virt.test.TestComponent");
 
-    return tc;
+    return TestComponent;
 }

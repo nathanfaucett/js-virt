@@ -4,21 +4,21 @@ var test = require("tape"),
     createRoot = require("./utils/createRoot");
 
 
-test("transaction triggers insert patch", function(t) {
-
+test("transaction triggers insert patch", function(assert) {
     var hits = 0;
-    var root = createRoot(function(transaction) {
+
+    var root = createRoot(function beforeCleanUp(transaction) {
+        var patches = transaction.patches,
+            patch;
 
         hits++;
 
-        var patches = transaction.patches;
-
         if (hits === 2) {
-            var patch = patches[root.id][0];
+            patch = patches[root.id][0];
 
-            t.equal(patch.id, root.id, "patch id should be on root");
-            t.equal(patch.type, "INSERT", "state change for child node triggers INSERT patch");
-            t.deepEqual(patch.next, {
+            assert.equal(patch.id, root.id, "patch id should be on root");
+            assert.equal(patch.type, "INSERT", "state change for child node triggers INSERT patch");
+            assert.deepEqual(patch.next, {
                 __owner: null,
                 __context: null,
                 type: "p",
@@ -28,9 +28,8 @@ test("transaction triggers insert patch", function(t) {
                 children: ["p-tag"]
             }, "takes in correct next insert patch");
 
-            t.end();
+            assert.end();
         }
-
     });
 
     var Component = createComponent({
@@ -41,7 +40,6 @@ test("transaction triggers insert patch", function(t) {
         var s = this.state;
 
         if (s.insertNode) {
-
             return (
                 View.create("div", null,
                     View.create("p", {
@@ -50,9 +48,7 @@ test("transaction triggers insert patch", function(t) {
                     }, "p-tag")
                 )
             );
-
         } else {
-
             return (
                 View.create("div", null,
                     View.create("a", {
@@ -61,9 +57,7 @@ test("transaction triggers insert patch", function(t) {
                     }, "a-tag")
                 )
             );
-
         }
-
     };
 
     Component.prototype.componentDidMount = function() {
@@ -75,8 +69,4 @@ test("transaction triggers insert patch", function(t) {
     root.render(View.create(Component, {
         key: 'component.key'
     })); // calls mount
-
-
-
-
 });

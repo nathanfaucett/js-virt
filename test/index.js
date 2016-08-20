@@ -1,7 +1,9 @@
 require("./event-test");
-require("./transaction.mount-test");
-require("./transaction.text-test");
 require("./transaction.insert-test");
-require("./transaction.replace-test");
+require("./transaction.mount-test");
+require("./transaction.order-test");
 require("./transaction.props-test");
+require("./transaction.replace-test");
+require("./transaction.text-test");
+require("./transaction.unmount-test");
 require("./view-test");
