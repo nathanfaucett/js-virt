@@ -1,4 +1,4 @@
-virt
+virt [![Build Status](https://travis-ci.org/nathanfaucett/virt.svg?branch=master)](https://travis-ci.org/nathanfaucett/virt)
 ======
 
 A tool for creating interactive UIs. Use views for each state in your application, and virt will find the differences and create a JSON object of the changes.
