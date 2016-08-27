@@ -12,7 +12,6 @@ module.exports = Component;
 function Component(props, children, context) {
     this.__node = null;
     this.__mountState = componentState.UNMOUNTED;
-    this.__nextState = null;
     this.props = props;
     this.children = children;
     this.context = context;
@@ -35,12 +34,23 @@ ComponentPrototype.render = function() {
 };
 
 ComponentPrototype.setState = function(state, callback) {
-    var node = this.__node;
-
-    this.__nextState = extend({}, this.state, state);
+    var node = this.__node,
+        nextState = extend({}, this.state, state);
 
     if (this.__mountState === componentState.MOUNTED) {
-        node.root.update(node, callback);
+        node.root.update(node, nextState, callback);
+    } else {
+        node.root.enqueueUpdate(node, nextState, callback);
+    }
+};
+
+ComponentPrototype.replaceState = function(state, callback) {
+    var node = this.__node;
+
+    if (this.__mountState === componentState.MOUNTED) {
+        node.root.update(node, state, callback);
+    } else {
+        node.root.enqueueUpdate(node, state, callback);
     }
 };
 
@@ -48,7 +58,9 @@ ComponentPrototype.forceUpdate = function(callback) {
     var node = this.__node;
 
     if (this.__mountState === componentState.MOUNTED) {
-        node.root.update(node, callback);
+        node.root.forceUpdate(node, callback);
+    } else {
+        node.root.enqueueUpdate(node, node.component.state, callback);
     }
 };
 

@@ -24,20 +24,17 @@ test("transaction triggers props patch", function(assert) {
 
             assert.end();
         }
-
     });
 
 
     var component = createComponent();
 
     component.prototype.render = function() {
-
         return View.create("p", {
             key: "p.key",
             ref: "p.ref",
             age: this.props.age
         }, "p-tag");
-
     };
 
     root.render(View.create(component, {
@@ -46,5 +43,4 @@ test("transaction triggers props patch", function(assert) {
     root.render(View.create(component, {
         age: 2
     }));
-
 });

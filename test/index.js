@@ -1,4 +1,5 @@
 require("./event-test");
+require("./transaction.enqueue-test");
 require("./transaction.insert-test");
 require("./transaction.mount-test");
 require("./transaction.order-test");

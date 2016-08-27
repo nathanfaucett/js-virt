@@ -3,6 +3,7 @@ var test = require("tape"),
     Component = require("../src/Component"),
     View = require("../src/View");
 
+
 test("View.create", function(assert) {
     var divView = View.create("div", {
         className: 'foo',

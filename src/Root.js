@@ -3,7 +3,6 @@ var isFunction = require("@nathanfaucett/is_function"),
     isUndefined = require("@nathanfaucett/is_undefined"),
     emptyFunction = require("@nathanfaucett/empty_function"),
     Transaction = require("./Transaction"),
-    diffProps = require("./utils/diffProps"),
     shouldUpdate = require("./utils/shouldUpdate"),
     EventManager = require("./EventManager"),
     Node = require("./Node");
@@ -24,7 +23,6 @@ function Root() {
     this.eventManager = new EventManager();
 
     this.nativeComponents = {};
-    this.diffProps = diffProps;
     this.adapter = null;
 
     this.__transactions = [];
@@ -72,13 +70,14 @@ RootPrototype.__processTransaction = function() {
         callback = transactionCallbacks[0];
 
         this.adapter.messenger.emit("virt.handleTransaction", transaction, function onHandleTransaction() {
+
+            _this.__currentTransaction = null;
+
             transactions.splice(0, 1);
             transactionCallbacks.splice(0, 1);
 
             transaction.queue.notifyAll();
             transaction.destroy();
-
-            _this.__currentTransaction = null;
 
             callback();
 
@@ -112,12 +111,35 @@ RootPrototype.unmount = function(callback) {
     }
 };
 
-RootPrototype.update = function(node, callback) {
+RootPrototype.update = function(node, state, callback) {
     var transaction = Transaction.create();
 
-    node.update(node.currentView, transaction);
-
+    node.update(node.currentView, state, transaction);
     this.__enqueueTransaction(transaction, callback);
+};
+
+RootPrototype.forceUpdate = function(node, callback) {
+    var transaction = Transaction.create();
+
+    node.forceUpdate(node.currentView, transaction);
+    this.__enqueueTransaction(transaction, callback);
+};
+
+RootPrototype.enqueueUpdate = function(node, nextState, callback) {
+    var _this = this,
+        transaction = this.__currentTransaction;
+
+    if (!isNull(transaction)) {
+        transaction.queue.enqueue(function onHandleTransaction() {
+            if (!isUndefined(_this.childHash[node.id])) {
+                _this.update(node, nextState, callback);
+            }
+        });
+    } else {
+        process.nextTick(function onNextTick() {
+            _this.update(node, nextState, callback);
+        });
+    }
 };
 
 RootPrototype.render = function(nextView, id, callback) {
@@ -135,7 +157,7 @@ RootPrototype.render = function(nextView, id, callback) {
     if (node) {
         if (shouldUpdate(node.currentView, nextView)) {
 
-            node.update(nextView, transaction);
+            node.forceUpdate(nextView, transaction);
             this.__enqueueTransaction(transaction, callback);
 
             return this;

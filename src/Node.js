@@ -14,7 +14,7 @@ var has = require("@nathanfaucett/has"),
     View = require("./View"),
     getChildKey = require("./utils/getChildKey"),
     emptyObject = require("./utils/emptyObject"),
-    diffChildren;
+    diffChildren, diffProps;
 
 
 var NodePrototype,
@@ -25,6 +25,7 @@ module.exports = Node;
 
 
 diffChildren = require("./utils/diffChildren");
+diffProps = require("./utils/diffProps");
 
 
 function Node(parentId, id, currentView) {
@@ -102,7 +103,7 @@ NodePrototype.mount = function(transaction) {
 };
 
 NodePrototype.__mount = function(transaction) {
-    var component, renderedView, renderedNode;
+    var renderedView, renderedNode, component;
 
     this.context = context.current;
     this.mountComponent();
@@ -204,17 +205,22 @@ NodePrototype.__unmountChildren = function(transaction) {
     }
 };
 
-NodePrototype.update = function(nextView, transaction) {
-    this.receiveView(nextView, nextView.__context, transaction);
+NodePrototype.update = function(nextView, nextState, transaction) {
+    this.receiveView(nextView, nextState, nextView.__context, transaction);
 };
 
-NodePrototype.receiveView = function(nextView, nextContext, transaction) {
+NodePrototype.forceUpdate = function(nextView, transaction) {
+    this.receiveView(nextView, this.component.state, nextView.__context, transaction);
+};
+
+NodePrototype.receiveView = function(nextView, nextState, nextContext, transaction) {
     var prevView = this.currentView,
         prevContext = this.context;
 
     this.updateComponent(
         prevView,
         nextView,
+        nextState,
         prevContext,
         nextContext,
         transaction
@@ -222,15 +228,12 @@ NodePrototype.receiveView = function(nextView, nextContext, transaction) {
 };
 
 NodePrototype.updateComponent = function(
-    prevParentView, nextParentView, prevUnmaskedContext, nextUnmaskedContext, transaction
+    prevParentView, nextParentView, nextState, prevUnmaskedContext, nextUnmaskedContext, transaction
 ) {
     var component = this.component,
-
         nextProps = component.props,
         nextChildren = component.children,
-        nextContext = component.context,
-
-        nextState;
+        nextContext = component.context;
 
     component.__mountState = componentState.UPDATING;
 
@@ -244,9 +247,11 @@ NodePrototype.updateComponent = function(
         }
     }
 
-    nextState = component.__nextState || component.state;
-
-    if (component.shouldComponentUpdate ? component.shouldComponentUpdate(nextProps, nextChildren, nextState, nextContext) : true) {
+    if (
+        component.shouldComponentUpdate ?
+        component.shouldComponentUpdate(nextProps, nextChildren, nextState, nextContext) :
+        true
+    ) {
         this.__updateComponent(
             nextParentView, nextProps, nextChildren, nextState, nextContext, nextUnmaskedContext, transaction
         );
@@ -259,7 +264,6 @@ NodePrototype.updateComponent = function(
         component.state = nextState;
         component.context = nextContext;
 
-        component.__nextState = null;
         component.__mountState = componentState.MOUNTED;
     }
 };
@@ -284,8 +288,6 @@ NodePrototype.__updateComponent = function(
     component.children = nextChildren;
     component.state = nextState;
     component.context = nextContext;
-
-    component.__nextState = null;
 
     this.context = unmaskedContext;
 
@@ -313,7 +315,7 @@ NodePrototype.__updateRenderedNode = function(context, transaction) {
         renderedNode;
 
     if (shouldUpdate(prevRenderedView, nextRenderedView)) {
-        prevNode.receiveView(nextRenderedView, this.__processChildContext(context), transaction);
+        prevNode.receiveView(nextRenderedView, this.component.state, this.__processChildContext(context), transaction);
     } else {
         prevNode.__unmount(transaction);
 
@@ -329,9 +331,14 @@ NodePrototype.__updateRenderedNode = function(context, transaction) {
 
 NodePrototype.__updateRenderedView = function(prevRenderedView, context, transaction) {
     var id = this.id,
-        root = this.root,
         nextRenderedView = this.renderView(),
-        propsDiff = root.diffProps(id, root.eventManager, transaction, prevRenderedView.props, nextRenderedView.props);
+        propsDiff = diffProps(
+            id,
+            this.root.eventManager,
+            transaction,
+            prevRenderedView.props,
+            nextRenderedView.props
+        );
 
     if (!isNull(propsDiff)) {
         transaction.props(id, prevRenderedView.props, propsDiff);

@@ -75,7 +75,7 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
 
                 if (node) {
                     if (shouldUpdate(previousChild, nextChild)) {
-                        node.update(nextChild, transaction);
+                        node.forceUpdate(nextChild, transaction);
                     } else {
                         node.__unmount(transaction);
                         parentNode.removeNode(node);

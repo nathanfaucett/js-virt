@@ -7,7 +7,7 @@ module.exports = createRoot;
 
 
 // callbacks called on each render
-function createRoot(beforeCleanUp, afterCleanUp) {
+function createRoot(beforeCleanUp, afterCleanUp, delay) {
     var root = new Root(),
 
         socket = createMessengerAdapter(),
@@ -28,19 +28,44 @@ function createRoot(beforeCleanUp, afterCleanUp) {
         if (beforeCleanUp) {
             beforeCleanUp(transaction);
         }
-        callback();
-        if (afterCleanUp) {
-            afterCleanUp(transaction);
+
+        function onTransaction() {
+            callback();
+            if (afterCleanUp) {
+                afterCleanUp(transaction);
+            }
+        }
+
+        if (delay) {
+            setTimeout(onTransaction, delay);
+        } else {
+            onTransaction();
         }
     });
     messengerClient.on("virt.onGlobalEvent", function onHandle(topLevelType, callback) {
-        callback();
+        if (delay) {
+            setTimeout(callback, delay);
+        } else {
+            callback();
+        }
     });
     messengerClient.on("virt.offGlobalEvent", function onHandle(topLevelType, callback) {
-        callback();
+        if (delay) {
+            setTimeout(callback, delay);
+        } else {
+            callback();
+        }
     });
     messengerClient.on("virt.getDeviceDimensions", function getDeviceDimensions(data, callback) {
-        callback(undefined, {});
+        function onGetDeviceDimensions() {
+            callback(undefined, {});
+        }
+
+        if (delay) {
+            setTimeout(onGetDeviceDimensions, delay);
+        } else {
+            onGetDeviceDimensions();
+        }
     });
 
     return root;
