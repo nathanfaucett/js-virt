@@ -1,6 +1,6 @@
 {
   "name": "@nathanfaucett/virt",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A tool for creating interactive UIs",
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "@nathanfaucett/messenger": "^0.0.1",
+    "@nathanfaucett/messenger": "^0.0.2",
     "@nathanfaucett/messenger_adapter": "^0.0.1",
     "@nathanfaucett/task": "^0.0.5",
     "gulp-jsbeautifier": "^2.0.3",

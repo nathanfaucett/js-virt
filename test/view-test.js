@@ -47,6 +47,16 @@ test("View.create with children", function(assert) {
     var tmp = View.create("div", {
             key: "d"
         },
+        0
+    );
+
+    assert.equal(tmp.children.length, 1, "inserts child views");
+    assert.equal(View.isPrimitiveView(tmp.children[0]), true);
+    assert.equal(tmp.key, "d");
+
+    var tmp1 = View.create("div", {
+            key: "d"
+        },
         View.create("span", {
             className: "s"
         }),
@@ -54,10 +64,10 @@ test("View.create with children", function(assert) {
         45
     );
 
-    assert.equal(tmp.children.length, 3, "inserts child views");
-    assert.equal(View.isPrimitiveView(tmp.children[0]), false, "view is not primitive");
-    assert.equal(View.isPrimitiveView(tmp.children[1]), true, "string is primitive view");
-    assert.equal(View.isPrimitiveView(tmp.children[2]), true, "number is primitive view");
+    assert.equal(tmp1.children.length, 3, "inserts child views");
+    assert.equal(View.isPrimitiveView(tmp1.children[0]), false, "view is not primitive");
+    assert.equal(View.isPrimitiveView(tmp1.children[1]), true, "string is primitive view");
+    assert.equal(View.isPrimitiveView(tmp1.children[2]), true, "number is primitive view");
 
     var tmp2 = View.create("div", [
         View.create("span", {

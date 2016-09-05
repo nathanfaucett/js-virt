@@ -112,7 +112,7 @@ View.create = function(type, config, children) {
             children = extractChildren(arguments, 1);
         }
         config = null;
-    } else if (children) {
+    } else if (!isNullOrUndefined(children)) {
         if (isArray(children)) {
             children = children;
         } else if (argumentsLength > 2) {
@@ -135,7 +135,7 @@ View.createFactory = function(type) {
                 children = extractChildren(arguments, 0);
             }
             config = null;
-        } else if (children) {
+        } else if (!isNullOrUndefined(children)) {
             if (isArray(children)) {
                 children = children;
             } else if (argumentsLength > 1) {
