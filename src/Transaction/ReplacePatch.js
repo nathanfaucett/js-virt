@@ -1,40 +1,13 @@
-var createPool = require("@nathanfaucett/create_pool"),
-    consts = require("./consts");
-
-
-var ReplacePatchPrototype;
+var consts = require("./consts");
 
 
 module.exports = ReplacePatch;
 
 
-function ReplacePatch() {
+function ReplacePatch(id, childId, index, next) {
     this.type = consts.REPLACE;
-    this.id = null;
-    this.childId = null;
-    this.index = null;
-    this.next = null;
+    this.id = id;
+    this.childId = childId;
+    this.index = index;
+    this.next = next;
 }
-createPool(ReplacePatch);
-ReplacePatchPrototype = ReplacePatch.prototype;
-
-ReplacePatch.create = function(id, childId, index, next) {
-    var patch = ReplacePatch.getPooled();
-    patch.id = id;
-    patch.childId = childId;
-    patch.index = index;
-    patch.next = next;
-    return patch;
-};
-
-ReplacePatchPrototype.destructor = function() {
-    this.id = null;
-    this.childId = null;
-    this.index = null;
-    this.next = null;
-    return this;
-};
-
-ReplacePatchPrototype.destroy = function() {
-    return ReplacePatch.release(this);
-};

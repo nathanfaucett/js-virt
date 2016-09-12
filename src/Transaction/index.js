@@ -1,6 +1,4 @@
-var createPool = require("@nathanfaucett/create_pool"),
-    Queue = require("@nathanfaucett/queue"),
-    has = require("@nathanfaucett/has"),
+var Queue = require("@nathanfaucett/queue"),
     consts = require("./consts"),
     InsertPatch = require("./InsertPatch"),
     MountPatch = require("./MountPatch"),
@@ -20,7 +18,7 @@ module.exports = Transaction;
 
 function Transaction() {
 
-    this.queue = Queue.getPooled();
+    this.queue = new Queue();
 
     this.removes = {};
     this.patches = {};
@@ -28,86 +26,40 @@ function Transaction() {
     this.events = {};
     this.eventsRemove = {};
 }
-createPool(Transaction);
+
 Transaction.consts = consts;
 TransactionPrototype = Transaction.prototype;
 
-Transaction.create = function() {
-    return Transaction.getPooled();
-};
-
-TransactionPrototype.destroy = function() {
-    Transaction.release(this);
-};
-
-function clearPatches(hash) {
-    var localHas = has,
-        id, array, j, jl;
-
-    for (id in hash) {
-        if (localHas(hash, id)) {
-            array = hash[id];
-            j = -1;
-            jl = array.length - 1;
-
-            while (j++ < jl) {
-                array[j].destroy();
-            }
-
-            delete hash[id];
-        }
-    }
-}
-
-function clearHash(hash) {
-    var localHas = has,
-        id;
-
-    for (id in hash) {
-        if (localHas(hash, id)) {
-            delete hash[id];
-        }
-    }
-}
-
-TransactionPrototype.destructor = function() {
-    clearPatches(this.patches);
-    clearPatches(this.removes);
-    clearHash(this.events);
-    clearHash(this.eventsRemove);
-    return this;
-};
-
 TransactionPrototype.mount = function(id, next) {
-    this.append(MountPatch.create(id, next));
+    this.append(new MountPatch(id, next));
 };
 
 TransactionPrototype.unmount = function(id) {
-    this.append(UnmountPatch.create(id));
+    this.append(new UnmountPatch(id));
 };
 
 TransactionPrototype.insert = function(id, childId, index, next) {
-    this.append(InsertPatch.create(id, childId, index, next));
+    this.append(new InsertPatch(id, childId, index, next));
 };
 
 TransactionPrototype.order = function(id, order) {
-    this.append(OrderPatch.create(id, order));
+    this.append(new OrderPatch(id, order));
 };
 
 TransactionPrototype.props = function(id, previous, props) {
-    this.append(PropsPatch.create(id, previous, props));
+    this.append(new PropsPatch(id, previous, props));
 };
 
 TransactionPrototype.replace = function(id, childId, index, next) {
-    this.append(ReplacePatch.create(id, childId, index, next));
+    this.append(new ReplacePatch(id, childId, index, next));
 };
 
 TransactionPrototype.text = function(id, index, next, props) {
-    this.append(TextPatch.create(id, index, next, props));
+    this.append(new TextPatch(id, index, next, props));
 };
 
 TransactionPrototype.remove = function(id, childId, index) {
-    this.appendRemove(RemovePatch.create(id, childId, index));
+    this.appendRemove(new RemovePatch(id, childId, index));
 };
 
 TransactionPrototype.event = function(id, type) {
@@ -143,7 +95,6 @@ TransactionPrototype.toJSON = function() {
     return {
         removes: this.removes,
         patches: this.patches,
-
         events: this.events,
         eventsRemove: this.eventsRemove
     };

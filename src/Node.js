@@ -142,9 +142,9 @@ NodePrototype.__mount = function(transaction) {
 NodePrototype.__mountChildren = function(renderedView, transaction) {
     var _this = this,
         parentId = this.id,
-        renderedChildren = [];
+        renderedChildren = this.renderedChildren || (this.renderedChildren = []);
 
-    this.renderedChildren = renderedChildren;
+    renderedChildren.length = 0;
 
     renderedView.children = arrayMap(renderedView.children, function renderChild(child, index) {
         var node, id;
@@ -174,7 +174,7 @@ NodePrototype.__unmount = function(transaction) {
     } else {
         this.__unmountChildren(transaction);
         this.root.eventManager.allOff(this.id, transaction);
-        this.renderedChildren = null;
+        this.renderedChildren.length = 0;
     }
 
     component.__mountState = componentState.UNMOUNTING;

@@ -1,37 +1,12 @@
-var createPool = require("@nathanfaucett/create_pool"),
-    consts = require("./consts");
-
-
-var PropsPatchPrototype;
+var consts = require("./consts");
 
 
 module.exports = PropsPatch;
 
 
-function PropsPatch() {
+function PropsPatch(id, previous, next) {
     this.type = consts.PROPS;
-    this.id = null;
-    this.previous = null;
-    this.next = null;
+    this.id = id;
+    this.previous = previous;
+    this.next = next;
 }
-createPool(PropsPatch);
-PropsPatchPrototype = PropsPatch.prototype;
-
-PropsPatch.create = function(id, previous, next) {
-    var patch = PropsPatch.getPooled();
-    patch.id = id;
-    patch.previous = previous;
-    patch.next = next;
-    return patch;
-};
-
-PropsPatchPrototype.destructor = function() {
-    this.id = null;
-    this.previous = null;
-    this.next = null;
-    return this;
-};
-
-PropsPatchPrototype.destroy = function() {
-    return PropsPatch.release(this);
-};

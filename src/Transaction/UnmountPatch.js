@@ -1,31 +1,10 @@
-var createPool = require("@nathanfaucett/create_pool"),
-    consts = require("./consts");
-
-
-var UnmountPatchPrototype;
+var consts = require("./consts");
 
 
 module.exports = UnmountPatch;
 
 
-function UnmountPatch() {
+function UnmountPatch(id) {
     this.type = consts.UNMOUNT;
-    this.id = null;
+    this.id = id;
 }
-createPool(UnmountPatch);
-UnmountPatchPrototype = UnmountPatch.prototype;
-
-UnmountPatch.create = function(id) {
-    var patch = UnmountPatch.getPooled();
-    patch.id = id;
-    return patch;
-};
-
-UnmountPatchPrototype.destructor = function() {
-    this.id = null;
-    return this;
-};
-
-UnmountPatchPrototype.destroy = function() {
-    return UnmountPatch.release(this);
-};

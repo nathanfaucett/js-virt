@@ -1,34 +1,11 @@
-var createPool = require("@nathanfaucett/create_pool"),
-    consts = require("./consts");
-
-
-var MountPatchPrototype;
+var consts = require("./consts");
 
 
 module.exports = MountPatch;
 
 
-function MountPatch() {
+function MountPatch(id, next) {
     this.type = consts.MOUNT;
-    this.id = null;
-    this.next = null;
+    this.id = id;
+    this.next = next;
 }
-createPool(MountPatch);
-MountPatchPrototype = MountPatch.prototype;
-
-MountPatch.create = function(id, next) {
-    var patch = MountPatch.getPooled();
-    patch.id = id;
-    patch.next = next;
-    return patch;
-};
-
-MountPatchPrototype.destructor = function() {
-    this.id = null;
-    this.next = null;
-    return this;
-};
-
-MountPatchPrototype.destroy = function() {
-    return MountPatch.release(this);
-};

@@ -98,7 +98,9 @@ View.clone = function(view, config, children) {
         children = view.children;
     }
 
-    return new View(view.type, key, ref, props, ensureValidChildren(children), viewOwner, context.current);
+    ensureValidChildren(children);
+
+    return new View(view.type, key, ref, props, children, viewOwner, context.current);
 };
 
 View.create = function(type, config, children) {
@@ -118,6 +120,8 @@ View.create = function(type, config, children) {
         } else if (argumentsLength > 2) {
             children = extractChildren(arguments, 2);
         }
+    } else {
+        children = [];
     }
 
     return construct(type, config, children);
@@ -179,7 +183,9 @@ function construct(type, config, children) {
         }
     }
 
-    return new View(type, key, ref, props, ensureValidChildren(children), owner.current, context.current);
+    ensureValidChildren(children);
+
+    return new View(type, key, ref, props, children, owner.current, context.current);
 }
 
 function toJSON(view) {
@@ -230,6 +236,7 @@ function extractChildren(args, offset) {
 
     while (i++ < il) {
         arg = args[i];
+
         if (!isNullOrUndefined(arg) && arg !== "" && !isArray(arg)) {
             children[j++] = arg;
         }
@@ -241,7 +248,7 @@ function extractChildren(args, offset) {
 function ensureValidChildren(children) {
     var i, il;
 
-    if (isArray(children)) {
+    if (process.env.NODE_ENV !== "production") {
         i = -1;
         il = children.length - 1;
 
@@ -250,9 +257,5 @@ function ensureValidChildren(children) {
                 throw new TypeError("child of a View must be a String, Number or a View");
             }
         }
-    } else {
-        children = [];
     }
-
-    return children;
 }

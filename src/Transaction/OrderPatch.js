@@ -1,34 +1,11 @@
-var createPool = require("@nathanfaucett/create_pool"),
-    consts = require("./consts");
-
-
-var OrderPatchPrototype;
+var consts = require("./consts");
 
 
 module.exports = OrderPatch;
 
 
-function OrderPatch() {
+function OrderPatch(id, order) {
     this.type = consts.ORDER;
-    this.id = null;
-    this.order = null;
+    this.id = id;
+    this.order = order;
 }
-createPool(OrderPatch);
-OrderPatchPrototype = OrderPatch.prototype;
-
-OrderPatch.create = function(id, order) {
-    var patch = OrderPatch.getPooled();
-    patch.id = id;
-    patch.order = order;
-    return patch;
-};
-
-OrderPatchPrototype.destructor = function() {
-    this.id = null;
-    this.order = null;
-    return this;
-};
-
-OrderPatchPrototype.destroy = function() {
-    return OrderPatch.release(this);
-};

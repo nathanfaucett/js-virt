@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@nathanfaucett/array-map": "^0.0.1",
-    "@nathanfaucett/create_pool": "^0.0.1",
     "@nathanfaucett/empty_function": "^0.0.1",
     "@nathanfaucett/extend": "^0.0.1",
     "@nathanfaucett/get_prototype_of": "^0.0.1",
