@@ -58,30 +58,23 @@ View.isViewJSON = isViewJSON;
 View.toJSON = toJSON;
 
 View.clone = function(view, config, children) {
-    var localHas = has,
-        props = extend({}, view.props),
+    var props = extend({}, view.props),
         key = view.key,
         ref = view.ref,
         viewOwner = view.__owner,
         childrenLength = arguments.length - 2,
-        propName, childArray, i, il;
+        childArray, i, il;
 
     if (config) {
-        if (config.ref) {
+        if (!isNullOrUndefined(config.ref)) {
             ref = config.ref;
             viewOwner = owner.current;
         }
-        if (config.key) {
+        if (!isNullOrUndefined(config.key)) {
             key = config.key;
         }
 
-        for (propName in config) {
-            if (localHas(config, propName)) {
-                if (!(propName === "key" || propName === "ref")) {
-                    props[propName] = config[propName];
-                }
-            }
-        }
+        extractConfig(props, config);
     }
 
     if (childrenLength === 1 && !isArray(children)) {
@@ -98,7 +91,9 @@ View.clone = function(view, config, children) {
         children = view.children;
     }
 
-    ensureValidChildren(children);
+    if (process.env.NODE_ENV !== "production") {
+        ensureValidChildren(children);
+    }
 
     return new View(view.type, key, ref, props, children, viewOwner, context.current);
 };
@@ -107,7 +102,7 @@ View.create = function(type, config, children) {
     var isConfigArray = isArray(config),
         argumentsLength = arguments.length;
 
-    if (isChild(config) || isConfigArray) {
+    if (isConfigArray || isChild(config)) {
         if (isConfigArray) {
             children = config;
         } else if (argumentsLength > 1) {
@@ -132,7 +127,7 @@ View.createFactory = function(type) {
         var isConfigArray = isArray(config),
             argumentsLength = arguments.length;
 
-        if (isChild(config) || isConfigArray) {
+        if (isConfigArray || isChild(config)) {
             if (isConfigArray) {
                 children = config;
             } else if (config && argumentsLength > 0) {
@@ -152,40 +147,53 @@ View.createFactory = function(type) {
 };
 
 function construct(type, config, children) {
-    var localHas = has,
-        props = {},
+    var props = {},
         key = null,
-        ref = null,
-        propName, defaultProps;
+        ref = null;
 
     if (config) {
-        key = config.key != null ? config.key : null;
-        ref = config.ref != null ? config.ref : null;
-
-        for (propName in config) {
-            if (localHas(config, propName)) {
-                if (!(propName === "key" || propName === "ref")) {
-                    props[propName] = config[propName];
-                }
-            }
+        if (!isNullOrUndefined(config.key)) {
+            key = config.key;
         }
+        if (!isNullOrUndefined(config.ref)) {
+            ref = config.ref;
+        }
+        extractConfig(props, config);
     }
-
     if (type && type.defaultProps) {
-        defaultProps = type.defaultProps;
-
-        for (propName in defaultProps) {
-            if (localHas(defaultProps, propName)) {
-                if (isNullOrUndefined(props[propName])) {
-                    props[propName] = defaultProps[propName];
-                }
-            }
-        }
+        extractDefaults(props, type.defaultProps);
     }
-
-    ensureValidChildren(children);
+    if (process.env.NODE_ENV !== "production") {
+        ensureValidChildren(children);
+    }
 
     return new View(type, key, ref, props, children, owner.current, context.current);
+}
+
+function extractConfig(props, config) {
+    var localHas = has,
+        propName;
+
+    for (propName in config) {
+        if (localHas(config, propName)) {
+            if (!(propName === "key" || propName === "ref")) {
+                props[propName] = config[propName];
+            }
+        }
+    }
+}
+
+function extractDefaults(props, defaultProps) {
+    var localHas = has,
+        propName;
+
+    for (propName in defaultProps) {
+        if (localHas(defaultProps, propName)) {
+            if (isNullOrUndefined(props[propName])) {
+                props[propName] = defaultProps[propName];
+            }
+        }
+    }
 }
 
 function toJSON(view) {
@@ -246,16 +254,12 @@ function extractChildren(args, offset) {
 }
 
 function ensureValidChildren(children) {
-    var i, il;
+    var i = -1;
+    il = children.length - 1;
 
-    if (process.env.NODE_ENV !== "production") {
-        i = -1;
-        il = children.length - 1;
-
-        while (i++ < il) {
-            if (!isChild(children[i])) {
-                throw new TypeError("child of a View must be a String, Number or a View");
-            }
+    while (i++ < il) {
+        if (!isChild(children[i])) {
+            throw new TypeError("child of a View must be a String, Number or a View");
         }
     }
 }
