@@ -77,6 +77,7 @@ RootPrototype.__processTransaction = function() {
             transactionCallbacks.splice(0, 1);
 
             transaction.queue.notifyAll();
+            Transaction.release(transaction);
 
             callback();
 
@@ -101,7 +102,7 @@ RootPrototype.unmount = function(callback) {
         transaction;
 
     if (node) {
-        transaction = new Transaction();
+        transaction = Transaction.create();
 
         transaction.unmount(this.id);
         node.__unmount(transaction);
@@ -111,14 +112,14 @@ RootPrototype.unmount = function(callback) {
 };
 
 RootPrototype.update = function(node, state, callback) {
-    var transaction = new Transaction();
+    var transaction = Transaction.create();
 
     node.update(node.currentView, state, transaction);
     this.__enqueueTransaction(transaction, callback);
 };
 
 RootPrototype.forceUpdate = function(node, callback) {
-    var transaction = new Transaction();
+    var transaction = Transaction.create();
 
     node.forceUpdate(node.currentView, transaction);
     this.__enqueueTransaction(transaction, callback);
@@ -142,7 +143,7 @@ RootPrototype.enqueueUpdate = function(node, nextState, callback) {
 };
 
 RootPrototype.render = function(nextView, id, callback) {
-    var transaction = new Transaction(),
+    var transaction = Transaction.create(),
         node;
 
     if (isFunction(id)) {

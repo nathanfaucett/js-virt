@@ -33,7 +33,9 @@
     "zuul": "^3.11.0"
   },
   "dependencies": {
+    "@nathanfaucett/array-for_each": "0.0.1",
     "@nathanfaucett/array-map": "^0.0.1",
+    "@nathanfaucett/create_pool": "0.0.1",
     "@nathanfaucett/empty_function": "^0.0.1",
     "@nathanfaucett/extend": "^0.0.1",
     "@nathanfaucett/get_prototype_of": "^0.0.1",
