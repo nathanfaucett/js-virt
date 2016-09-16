@@ -13,7 +13,6 @@ var has = require("@nathanfaucett/has"),
     getComponentClassForType = require("./utils/getComponentClassForType"),
     View = require("./View"),
     getChildKey = require("./utils/getChildKey"),
-    emptyObject = require("./utils/emptyObject"),
     diffChildren, diffProps;
 
 
@@ -401,11 +400,10 @@ NodePrototype.__checkTypes = function(propTypes, props) {
 };
 
 NodePrototype.__processProps = function(props) {
-    var ComponentClass = this.ComponentClass,
-        propTypes;
+    var propTypes;
 
     if (process.env.NODE_ENV !== "production") {
-        propTypes = ComponentClass.propTypes;
+        propTypes = this.ComponentClass.propTypes;
 
         if (propTypes) {
             this.__checkTypes(propTypes, props);
@@ -416,27 +414,30 @@ NodePrototype.__processProps = function(props) {
 };
 
 NodePrototype.__maskContext = function(context) {
-    var maskedContext = null,
+    var maskedContext = context,
         contextTypes, contextName, localHas;
 
-    if (isString(this.ComponentClass)) {
-        return emptyObject;
-    } else {
-        contextTypes = this.ComponentClass.contextTypes;
+    if (process.env.NODE_ENV !== "production") {
+        if (isString(this.ComponentClass)) {
+            return null;
+        } else if (!isNull(context)) {
+            contextTypes = this.ComponentClass.contextTypes;
+            maskedContext = null;
 
-        if (contextTypes) {
-            maskedContext = {};
-            localHas = has;
+            if (contextTypes) {
+                maskedContext = {};
+                localHas = has;
 
-            for (contextName in contextTypes) {
-                if (localHas(contextTypes, contextName)) {
-                    maskedContext[contextName] = context[contextName];
+                for (contextName in contextTypes) {
+                    if (localHas(contextTypes, contextName)) {
+                        maskedContext[contextName] = context[contextName];
+                    }
                 }
             }
         }
-
-        return maskedContext;
     }
+
+    return maskedContext;
 };
 
 NodePrototype.__processContext = function(context) {
@@ -444,10 +445,12 @@ NodePrototype.__processContext = function(context) {
         contextTypes;
 
     if (process.env.NODE_ENV !== "production") {
-        contextTypes = this.ComponentClass.contextTypes;
+        if (!isNull(maskedContext)) {
+            contextTypes = this.ComponentClass.contextTypes;
 
-        if (contextTypes) {
-            this.__checkTypes(contextTypes, maskedContext);
+            if (contextTypes) {
+                this.__checkTypes(contextTypes, maskedContext);
+            }
         }
     }
 
@@ -466,17 +469,17 @@ NodePrototype.__processChildContext = function(currentContext) {
             if (childContextTypes) {
                 this.__checkTypes(childContextTypes, childContext);
             }
-        }
 
-        if (childContextTypes) {
-            localHas = has;
-            displayName = this.__getName();
+            if (childContextTypes) {
+                localHas = has;
+                displayName = this.__getName();
 
-            for (contextName in childContext) {
-                if (!localHas(childContextTypes, contextName)) {
-                    console.warn(new Error(
-                        displayName + " getChildContext(): key " + contextName + " is not defined in childContextTypes"
-                    ));
+                for (contextName in childContext) {
+                    if (!localHas(childContextTypes, contextName)) {
+                        console.warn(new Error(
+                            displayName + " getChildContext(): key " + contextName + " is not defined in childContextTypes"
+                        ));
+                    }
                 }
             }
         }
