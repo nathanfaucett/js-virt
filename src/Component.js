@@ -1,5 +1,6 @@
 var inherits = require("@nathanfaucett/inherits"),
     extend = require("@nathanfaucett/extend"),
+    isNull = require("@nathanfaucett/is_null"),
     componentState = require("./utils/componentState");
 
 
@@ -39,7 +40,7 @@ ComponentPrototype.setState = function(state, callback) {
 
     if (this.__mountState === componentState.MOUNTED) {
         node.root.update(node, nextState, callback);
-    } else {
+    } else if (!isNull(node.root)) {
         node.root.enqueueUpdate(node, nextState, callback);
     }
 };
@@ -49,7 +50,7 @@ ComponentPrototype.replaceState = function(state, callback) {
 
     if (this.__mountState === componentState.MOUNTED) {
         node.root.update(node, state, callback);
-    } else {
+    } else if (!isNull(node.root)) {
         node.root.enqueueUpdate(node, state, callback);
     }
 };
@@ -59,7 +60,7 @@ ComponentPrototype.forceUpdate = function(callback) {
 
     if (this.__mountState === componentState.MOUNTED) {
         node.root.forceUpdate(node, callback);
-    } else {
+    } else if (!isNull(node.root)) {
         node.root.enqueueUpdate(node, node.component.state, callback);
     }
 };
