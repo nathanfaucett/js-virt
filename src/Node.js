@@ -459,10 +459,10 @@ NodePrototype.__processContext = function(context) {
 
 NodePrototype.__processChildContext = function(currentContext) {
     var component = this.component,
-        childContext = isFunction(component.getChildContext) ? component.getChildContext() : null,
-        childContextTypes, localHas, contextName, displayName;
+        childContext, childContextTypes, localHas, contextName, displayName;
 
-    if (childContext) {
+    if (isFunction(component.getChildContext)) {
+        childContext = component.getChildContext();
         childContextTypes = this.ComponentClass.childContextTypes;
 
         if (process.env.NODE_ENV !== "production") {

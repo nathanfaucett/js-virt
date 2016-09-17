@@ -1,6 +1,6 @@
 {
   "name": "@nathanfaucett/virt",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A tool for creating interactive UIs",
   "repository": {
     "type": "git",
@@ -23,8 +23,7 @@
   "devDependencies": {
     "@nathanfaucett/messenger": "^0.0.2",
     "@nathanfaucett/messenger_adapter": "^0.0.1",
-    "@nathanfaucett/task": "^0.0.5",
-    "benchmark": "^2.1.1",
+    "@nathanfaucett/task": "^0.0.6",
     "gulp-jsbeautifier": "^2.0.3",
     "gulp-jshint": "^2.0.1",
     "jshint": "^2.9.3",
@@ -37,11 +36,11 @@
     "@nathanfaucett/array-map": "^0.0.1",
     "@nathanfaucett/create_pool": "0.0.1",
     "@nathanfaucett/empty_function": "^0.0.1",
-    "@nathanfaucett/extend": "^0.0.1",
+    "@nathanfaucett/extend": "^0.0.2",
     "@nathanfaucett/get_prototype_of": "^0.0.1",
     "@nathanfaucett/has": "^0.0.1",
     "@nathanfaucett/index_of": "^0.0.1",
-    "@nathanfaucett/inherits": "^0.0.1",
+    "@nathanfaucett/inherits": "^0.0.2",
     "@nathanfaucett/is_array": "^0.0.1",
     "@nathanfaucett/is_function": "^0.0.1",
     "@nathanfaucett/is_null": "^0.0.1",

@@ -39,11 +39,11 @@ RootPrototype.appendNode = function(node) {
     var id = node.id,
         childHash = this.childHash;
 
-    if (isUndefined(childHash[id])) {
+    if (childHash[id]) {
+        throw new Error("Root appendNode(node) trying to override node at " + id);
+    } else {
         node.root = this;
         childHash[id] = node;
-    } else {
-        throw new Error("Root appendNode(node) trying to override node at " + id);
     }
 };
 

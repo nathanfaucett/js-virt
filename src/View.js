@@ -99,20 +99,19 @@ View.clone = function(view, config, children) {
 };
 
 View.create = function(type, config, children) {
-    var isConfigArray = isArray(config),
-        argumentsLength = arguments.length;
+    var isConfigArray = isArray(config);
 
     if (isConfigArray || isChild(config)) {
         if (isConfigArray) {
             children = config;
-        } else if (argumentsLength > 1) {
+        } else if (arguments.length > 1) {
             children = extractChildren(arguments, 1);
         }
         config = null;
     } else if (!isNullOrUndefined(children)) {
         if (isArray(children)) {
             children = children;
-        } else if (argumentsLength > 2) {
+        } else if (arguments.length > 2) {
             children = extractChildren(arguments, 2);
         }
     } else {
@@ -124,20 +123,19 @@ View.create = function(type, config, children) {
 
 View.createFactory = function(type) {
     return function factory(config, children) {
-        var isConfigArray = isArray(config),
-            argumentsLength = arguments.length;
+        var isConfigArray = isArray(config);
 
         if (isConfigArray || isChild(config)) {
             if (isConfigArray) {
                 children = config;
-            } else if (config && argumentsLength > 0) {
+            } else if (config && arguments.length > 0) {
                 children = extractChildren(arguments, 0);
             }
             config = null;
         } else if (!isNullOrUndefined(children)) {
             if (isArray(children)) {
                 children = children;
-            } else if (argumentsLength > 1) {
+            } else if (arguments.length > 1) {
                 children = extractChildren(arguments, 1);
             }
         }
@@ -152,10 +150,10 @@ function construct(type, config, children) {
         ref = null;
 
     if (config) {
-        if (!isNullOrUndefined(config.key)) {
+        if (isString(config.key)) {
             key = config.key;
         }
-        if (!isNullOrUndefined(config.ref)) {
+        if (isString(config.ref)) {
             ref = config.ref;
         }
         extractConfig(props, config);

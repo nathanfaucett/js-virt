@@ -1,5 +1,4 @@
-var has = require("@nathanfaucett/has"),
-    isObject = require("@nathanfaucett/is_object"),
+var isObject = require("@nathanfaucett/is_object"),
     getPrototypeOf = require("@nathanfaucett/get_prototype_of"),
     isNull = require("@nathanfaucett/is_null"),
     isNullOrUndefined = require("@nathanfaucett/is_null_or_undefined");
@@ -10,7 +9,6 @@ module.exports = diffProps;
 
 function diffProps(id, eventManager, transaction, previous, next) {
     var result = null,
-        localHas = has,
         propNameToTopLevel = eventManager.propNameToTopLevel,
         key, previousValue, nextValue, propsDiff;
 
@@ -21,7 +19,7 @@ function diffProps(id, eventManager, transaction, previous, next) {
             result = result || {};
             result[key] = undefined;
 
-            if (localHas(propNameToTopLevel, key)) {
+            if (propNameToTopLevel[key]) {
                 eventManager.off(id, propNameToTopLevel[key], transaction);
             }
         } else {
@@ -35,6 +33,7 @@ function diffProps(id, eventManager, transaction, previous, next) {
                     result[key] = nextValue;
                 } else {
                     propsDiff = diffProps(id, eventManager, transaction, previousValue, nextValue);
+
                     if (!isNull(propsDiff)) {
                         result = result || {};
                         result[key] = propsDiff;
@@ -54,7 +53,7 @@ function diffProps(id, eventManager, transaction, previous, next) {
             result = result || {};
             result[key] = nextValue;
 
-            if (localHas(propNameToTopLevel, key)) {
+            if (propNameToTopLevel[key]) {
                 eventManager.on(id, propNameToTopLevel[key], nextValue, transaction);
             }
         }
