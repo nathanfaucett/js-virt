@@ -45,19 +45,24 @@ test("event", function(assert) {
 
     var Component = createComponent({
         text: "default"
+    }, function constructor() {
+        var _this = this;
+        this.onEvent = function(e) {
+            return _this._onEvent(e);
+        };
     });
 
-    Component.prototype.render = function() {
-        var _this = this;
+    Component.prototype._onEvent = function(e) {
+        this.setState({
+            text: e.data
+        });
+    };
 
+    Component.prototype.render = function() {
         return (
             View.create("p", {
-                onEvent: function(event) {
-                    _this.setState({
-                        text: event.data
-                    });
-                }
-            }, _this.state.text)
+                onEvent: this.onEvent
+            }, this.state.text)
         );
 
     };

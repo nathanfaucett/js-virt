@@ -1,4 +1,5 @@
 var has = require("@nathanfaucett/has"),
+    createPool = require("@nathanfaucett/create_pool"),
     arrayMap = require("@nathanfaucett/array-map"),
     indexOf = require("@nathanfaucett/index_of"),
     isNull = require("@nathanfaucett/is_null"),
@@ -48,8 +49,16 @@ function Node(parentId, id, currentView) {
 
     this.currentView = currentView;
 }
-
+createPool(Node);
 NodePrototype = Node.prototype;
+
+Node.create = function(parentId, id, currentView) {
+    return Node.getPooled(parentId, id, currentView);
+};
+
+NodePrototype.destroy = function() {
+    Node.release(this);
+};
 
 NodePrototype.appendNode = function(node) {
     var renderedChildren = this.renderedChildren;
@@ -70,6 +79,8 @@ NodePrototype.removeNode = function(node) {
     if (index !== -1) {
         renderedChildren.splice(index, 1);
     }
+
+    node.destroy();
 };
 
 NodePrototype.mountComponent = function() {
@@ -110,7 +121,7 @@ NodePrototype.__mount = function(transaction) {
     renderedView = this.renderView();
 
     if (this.isTopLevel !== true) {
-        renderedNode = this.renderedNode = new Node(this.parentId, this.id, renderedView);
+        renderedNode = this.renderedNode = Node.create(this.parentId, this.id, renderedView);
         renderedNode.root = this.root;
         renderedNode.isBottomLevel = false;
         renderedView = renderedNode.__mount(transaction);
@@ -152,7 +163,7 @@ NodePrototype.__mountChildren = function(renderedView, transaction) {
             return child;
         } else {
             id = getChildKey(parentId, child, index);
-            node = new Node(parentId, id, child);
+            node = Node.create(parentId, id, child);
             _this.appendNode(node);
             return node.__mount(transaction);
         }
@@ -321,7 +332,7 @@ NodePrototype.__updateRenderedNode = function(context, transaction) {
     } else {
         prevNode.__unmount(transaction);
 
-        renderedNode = this.renderedNode = new Node(this.parentId, this.id, nextRenderedView);
+        renderedNode = this.renderedNode = Node.create(this.parentId, this.id, nextRenderedView);
         renderedNode.root = this.root;
         renderedNode.isBottomLevel = false;
 

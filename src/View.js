@@ -66,14 +66,13 @@ View.clone = function(view, config, children) {
         childArray, i, il;
 
     if (config) {
-        if (!isNullOrUndefined(config.ref)) {
+        if (isString(config.ref)) {
             ref = config.ref;
             viewOwner = owner.current;
         }
-        if (!isNullOrUndefined(config.key)) {
+        if (isString(config.key)) {
             key = config.key;
         }
-
         extractConfig(props, config);
     }
 

@@ -44,7 +44,7 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
                 transaction.insert(parentId, null, index, nextChild);
             } else {
                 id = getChildKey(parentId, nextChild, index);
-                node = new Node(parentId, id, nextChild);
+                node = Node.create(parentId, id, nextChild);
                 parentNode.appendNode(node);
                 transaction.insert(parentId, id, index, node.__mount(transaction));
             }
@@ -55,7 +55,7 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
                 transaction.text(parentId, index, nextChild, next.props);
             } else {
                 id = getChildKey(parentId, nextChild, index);
-                node = new Node(parentId, id, nextChild);
+                node = Node.create(parentId, id, nextChild);
                 parentNode.appendNode(node);
                 transaction.replace(parentId, id, index, node.__mount(transaction));
             }
@@ -81,13 +81,13 @@ function diffChild(root, parentNode, previous, next, previousChild, nextChild, p
                         parentNode.removeNode(node);
 
                         id = getChildKey(parentId, nextChild, index);
-                        node = new Node(parentId, id, nextChild);
+                        node = Node.create(parentId, id, nextChild);
                         parentNode.appendNode(node);
                         transaction.replace(parentId, id, index, node.__mount(transaction));
                     }
                 } else {
                     id = getChildKey(parentId, nextChild, index);
-                    node = new Node(parentId, id, nextChild);
+                    node = Node.create(parentId, id, nextChild);
                     parentNode.appendNode(node);
                     transaction.insert(parentId, id, index, node.__mount(transaction));
                 }

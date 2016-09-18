@@ -171,7 +171,7 @@ RootPrototype.render = function(nextView, id, callback) {
         }
     }
 
-    node = new Node(this.id, id, nextView);
+    node = Node.create(this.id, id, nextView);
     this.appendNode(node);
     node.mount(transaction);
 

@@ -114,7 +114,7 @@ TransactionPrototype.removeEvent = function(id, type) {
 
 function append(hash, array, value) {
     var id = value.id,
-        patchArray = hash[id];
+        patchArray;
 
     if (!(patchArray = hash[id])) {
         patchArray = hash[id] = array[array.length] = [];

@@ -10,7 +10,7 @@ module.exports = diffProps;
 function diffProps(id, eventManager, transaction, previous, next) {
     var result = null,
         propNameToTopLevel = eventManager.propNameToTopLevel,
-        key, previousValue, nextValue, propsDiff;
+        key, topLevel, previousValue, nextValue, propsDiff;
 
     for (key in previous) {
         nextValue = next[key];
@@ -19,14 +19,15 @@ function diffProps(id, eventManager, transaction, previous, next) {
             result = result || {};
             result[key] = undefined;
 
-            if (propNameToTopLevel[key]) {
-                eventManager.off(id, propNameToTopLevel[key], transaction);
+            if ((topLevel = propNameToTopLevel[key])) {
+                eventManager.off(id, topLevel, transaction);
             }
         } else {
             previousValue = previous[key];
 
-            if (previousValue === nextValue) {
-                continue;
+            if (previousValue !== nextValue) {
+                result = result || {};
+                result[key] = nextValue;
             } else if (isObject(previousValue) && isObject(nextValue)) {
                 if (getPrototypeOf(previousValue) !== getPrototypeOf(nextValue)) {
                     result = result || {};
@@ -39,9 +40,6 @@ function diffProps(id, eventManager, transaction, previous, next) {
                         result[key] = propsDiff;
                     }
                 }
-            } else {
-                result = result || {};
-                result[key] = nextValue;
             }
         }
     }
@@ -53,8 +51,8 @@ function diffProps(id, eventManager, transaction, previous, next) {
             result = result || {};
             result[key] = nextValue;
 
-            if (propNameToTopLevel[key]) {
-                eventManager.on(id, propNameToTopLevel[key], nextValue, transaction);
+            if ((topLevel = propNameToTopLevel[key])) {
+                eventManager.on(id, topLevel, nextValue, transaction);
             }
         }
     }
