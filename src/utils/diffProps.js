@@ -25,9 +25,8 @@ function diffProps(id, eventManager, transaction, previous, next) {
         } else {
             previousValue = previous[key];
 
-            if (previousValue !== nextValue) {
-                result = result || {};
-                result[key] = nextValue;
+            if (previousValue === nextValue) {
+                continue;
             } else if (isObject(previousValue) && isObject(nextValue)) {
                 if (getPrototypeOf(previousValue) !== getPrototypeOf(nextValue)) {
                     result = result || {};
@@ -40,6 +39,9 @@ function diffProps(id, eventManager, transaction, previous, next) {
                         result[key] = propsDiff;
                     }
                 }
+            } else {
+                result = result || {};
+                result[key] = nextValue;
             }
         }
     }
