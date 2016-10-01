@@ -129,16 +129,16 @@ RootPrototype.enqueueUpdate = function(node, nextState, callback) {
     var _this = this,
         transaction = this.__currentTransaction;
 
-    if (!isNull(transaction)) {
-        transaction.queue.enqueue(function onHandleTransaction() {
-            if (!isUndefined(_this.childHash[node.id])) {
-                _this.update(node, nextState, callback);
-            }
-        });
-    } else {
-        process.nextTick(function onNextTick() {
+    function onHandleTransaction() {
+        if (!isUndefined(_this.childHash[node.id])) {
             _this.update(node, nextState, callback);
-        });
+        }
+    }
+
+    if (isNull(transaction)) {
+        process.nextTick(onHandleTransaction);
+    } else {
+        transaction.queue.enqueue(onHandleTransaction);
     }
 };
 
