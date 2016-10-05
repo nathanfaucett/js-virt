@@ -73,8 +73,8 @@ RootPrototype.__processTransaction = function() {
 
             _this.__currentTransaction = null;
 
-            transactions.splice(0, 1);
-            transactionCallbacks.splice(0, 1);
+            transactions.shift();
+            transactionCallbacks.shift();
 
             transaction.queue.notifyAll();
             Transaction.release(transaction);
