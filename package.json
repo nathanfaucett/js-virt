@@ -1,6 +1,6 @@
 {
   "name": "@nathanfaucett/virt",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A tool for creating interactive UIs",
   "repository": {
     "type": "git",

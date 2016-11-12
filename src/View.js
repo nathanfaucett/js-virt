@@ -251,8 +251,8 @@ function extractChildren(args, offset) {
 }
 
 function ensureValidChildren(children) {
-    var i = -1;
-    il = children.length - 1;
+    var i = -1,
+        il = children.length - 1;
 
     while (i++ < il) {
         if (!isChild(children[i])) {

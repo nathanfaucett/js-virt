@@ -1,4 +1,5 @@
-var context = exports;
-
-
-context.current = null;
+module.exports = global.__GLOBAL_VIRT_CONTEXT__ || (
+    global.__GLOBAL_VIRT_CONTEXT__ = {
+        current: null
+    }
+);
