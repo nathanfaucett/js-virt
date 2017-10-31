@@ -1,19 +1,31 @@
 virt [![Build Status](https://travis-ci.org/nathanfaucett/virt.svg?branch=master)](https://travis-ci.org/nathanfaucett/virt)
 ======
 
-A tool for creating interactive UIs. Use views for each state in your application, and virt will find the differences and create a JSON object of the changes.
+virt is a tool for creating interactive UIs. Use views for each state in your application, and virt will find the differences and create a Transaction JSON object for the changes.
 
-use of a renderer for the JSON is nesseecary the only one aviable right now is [virt-dom](https://github.com/nathanfaucett/virt-dom)
+use of a renderer for the transaction is nesseecary the only one aviable right now is [virt-dom](https://github.com/nathanfaucett/virt-dom)
 
+## Install using npm
+```bash
+$ npm install @nathanfaucett/virt --save
+```
+## Install using yarn
+```bash
+$ yarn install @nathanfaucett/virt --save
+```
 
-###Components
+### Components
+
+Components let you split views into reusable pieces
+
+virt.Component is an abstract base class, so you will have to subclass it, and define at least a render() method.
+
 ```javascript
-var virt = require("virt");
+var virt = require("@nathanfaucett/virt");
 
-/*
-    Components are used in Views like type strings
-    virt.createView(SomeComponent, { ... props }, ... children)
-*/
+
+// Components are used in Views like strings
+// virt.createView(SomeComponent, { ... props }, ... children)
 function SomeComponent(props, children, context) {
     virt.Component.call(this, props, children, context);
 }
